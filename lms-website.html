@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LibraryOS — Modern Library Management System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0B1F3A;
+    --navy-mid: #132d52;
+    --blue: #1B6CA8;
+    --blue-lt: #2E8FD8;
+    --accent: #F5A623;
+    --accent-lt: #FFD285;
+    --green: #17B978;
+    --green-lt: #D4F5E9;
+    --white: #FFFFFF;
+    --off-white: #F7F9FC;
+    --gray-100: #EEF2F7;
+    --gray-200: #D8E2EE;
+    --gray-400: #8FA3BB;
+    --gray-600: #4A6580;
+    --gray-800: #243347;
+    --text: #0B1F3A;
+    --text-muted: #4A6580;
+    --radius-sm: 8px;
+    --radius: 14px;
+    --radius-lg: 22px;
+    --shadow-sm: 0 2px 12px rgba(11,31,58,0.07);
+    --shadow: 0 6px 32px rgba(11,31,58,0.11);
+    --shadow-lg: 0 16px 60px rgba(11,31,58,0.16);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    color: var(--text);
+    background: var(--white);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+  h1,h2,h3,h4,h5 { font-family: 'Syne', sans-serif; line-height: 1.18; }
+  a { text-decoration: none; color: inherit; }
+  img { max-width: 100%; display: block; }
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+  .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+    background: rgba(27,108,168,0.09); color: var(--blue); border-radius: 100px;
+    padding: 5px 14px; margin-bottom: 18px;
+  }
+  .tag-accent { background: rgba(245,166,35,0.13); color: #B8780A; }
+  .tag-green { background: rgba(23,185,120,0.12); color: #0D8557; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
+    padding: 13px 28px; border-radius: var(--radius-sm); cursor: pointer;
+    transition: all 0.2s; border: none; white-space: nowrap;
+  }
+  .btn-primary {
+    background: var(--accent); color: var(--navy);
+    box-shadow: 0 4px 18px rgba(245,166,35,0.35);
+  }
+  .btn-primary:hover { background: #e89a18; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,166,35,0.45); }
+  .btn-outline {
+    background: transparent; color: var(--white);
+    border: 1.5px solid rgba(255,255,255,0.4);
+  }
+  .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.7); }
+  .btn-blue { background: var(--blue); color: var(--white); box-shadow: 0 4px 18px rgba(27,108,168,0.3); }
+  .btn-blue:hover { background: #155d96; transform: translateY(-2px); }
+  .btn-ghost { background: transparent; color: var(--blue); border: 1.5px solid var(--blue); }
+  .btn-ghost:hover { background: var(--blue); color: var(--white); }
+  .section { padding: 90px 0; }
+  .section-sm { padding: 60px 0; }
+  .section-title { font-size: clamp(28px, 4vw, 42px); font-weight: 700; margin-bottom: 16px; }
+  .section-sub { font-size: 17px; color: var(--text-muted); max-width: 560px; line-height: 1.7; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .text-center { text-align: center; }
+  .text-center .section-sub { margin: 0 auto; }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+    background: rgba(11,31,58,0.97); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 66px; max-width: 1180px; margin: 0 auto; padding: 0 24px;
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
+    color: var(--white); display: flex; align-items: center; gap: 10px;
+  }
+  .logo-icon {
+    width: 34px; height: 34px; background: var(--accent);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  }
+  .logo-icon svg { width: 18px; height: 18px; fill: var(--navy); }
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-links a { color: rgba(255,255,255,0.75); font-size: 14px; font-weight: 400; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--white); }
+  .nav-cta { display: flex; gap: 12px; }
+  .nav-cta .btn { padding: 9px 20px; font-size: 14px; }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: linear-gradient(135deg, #0B1F3A 0%, #132d52 60%, #1a3a6e 100%);
+    min-height: 100vh; display: flex; align-items: center;
+    padding: 120px 0 80px; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -200px; right: -200px;
+    width: 600px; height: 600px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(27,108,168,0.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: ''; position: absolute; bottom: -100px; left: -100px;
+    width: 400px; height: 400px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,166,35,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; position: relative; z-index: 1; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(245,166,35,0.15); border: 1px solid rgba(245,166,35,0.3);
+    color: var(--accent-lt); font-size: 13px; border-radius: 100px;
+    padding: 6px 16px; margin-bottom: 24px;
+  }
+  .hero-badge span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: block; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.4)} }
+  .hero h1 {
+    font-size: clamp(36px, 5vw, 58px); font-weight: 800;
+    color: var(--white); margin-bottom: 22px; letter-spacing: -0.02em;
+  }
+  .hero h1 .highlight { color: var(--accent); }
+  .hero p {
+    font-size: 18px; color: rgba(255,255,255,0.72); margin-bottom: 36px;
+    line-height: 1.75; max-width: 480px;
+  }
+  .hero-ctas { display: flex; gap: 16px; flex-wrap: wrap; }
+  .hero-stats { display: flex; gap: 32px; margin-top: 44px; padding-top: 36px; border-top: 1px solid rgba(255,255,255,0.1); }
+  .hero-stat-num { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; color: var(--white); }
+  .hero-stat-label { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+  /* Dashboard mockup */
+  .dashboard-frame {
+    background: #fff; border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255,255,255,0.15);
+    overflow: hidden; border: 1px solid rgba(255,255,255,0.15);
+    animation: floatUp 6s ease-in-out infinite;
+  }
+  @keyframes floatUp { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .db-topbar {
+    background: var(--navy); padding: 10px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .db-dots { display: flex; gap: 6px; }
+  .db-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .db-title { color: rgba(255,255,255,0.6); font-size: 12px; }
+  .db-body { padding: 16px; background: var(--off-white); }
+  .db-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .db-card {
+    background: var(--white); border-radius: 10px; padding: 12px 14px;
+    border: 1px solid var(--gray-200);
+  }
+  .db-card-num { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--navy); }
+  .db-card-label { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+  .db-card-dot { width: 8px; height: 8px; border-radius: 50%; margin-bottom: 8px; }
+  .db-table { background: var(--white); border-radius: 10px; border: 1px solid var(--gray-200); overflow: hidden; }
+  .db-table-head { background: var(--gray-100); display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr; padding: 8px 14px; font-size: 11px; font-weight: 500; color: var(--gray-600); }
+  .db-table-row { display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr; padding: 8px 14px; border-top: 1px solid var(--gray-100); font-size: 12px; align-items: center; }
+  .db-badge { display: inline-block; padding: 2px 8px; border-radius: 100px; font-size: 10px; font-weight: 500; }
+  .badge-green { background: var(--green-lt); color: #0D8557; }
+  .badge-amber { background: rgba(245,166,35,0.15); color: #B8780A; }
+  .badge-red { background: rgba(232,67,67,0.1); color: #C0392B; }
+
+  /* ─── PROBLEMS ─── */
+  .problems { background: var(--off-white); }
+  .problem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 50px; }
+  .problem-card {
+    background: var(--white); border-radius: var(--radius); padding: 28px;
+    border: 1px solid var(--gray-200); border-left: 4px solid #E84343;
+  }
+  .problem-icon { font-size: 28px; margin-bottom: 14px; }
+  .problem-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 10px; color: var(--navy); }
+  .problem-card p { font-size: 14px; color: var(--text-muted); line-height: 1.65; }
+
+  /* ─── SOLUTION ─── */
+  .solution-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; margin-top: 60px; }
+  .solution-item { display: flex; gap: 18px; margin-bottom: 28px; }
+  .sol-icon {
+    width: 46px; height: 46px; border-radius: var(--radius-sm); flex-shrink: 0;
+    background: rgba(27,108,168,0.1); display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .sol-item-title { font-weight: 600; font-size: 16px; margin-bottom: 5px; }
+  .sol-item-text { font-size: 14px; color: var(--text-muted); }
+
+  /* ─── FEATURES ─── */
+  .features { background: var(--navy); }
+  .features .section-title { color: var(--white); }
+  .features .section-sub { color: rgba(255,255,255,0.6); }
+  .features .tag { background: rgba(245,166,35,0.15); color: var(--accent-lt); }
+  .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 50px; }
+  .feat-card {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius); padding: 30px 28px; transition: all 0.25s;
+  }
+  .feat-card:hover { background: rgba(255,255,255,0.09); transform: translateY(-4px); border-color: rgba(245,166,35,0.4); }
+  .feat-icon {
+    width: 52px; height: 52px; border-radius: var(--radius-sm); margin-bottom: 20px;
+    background: rgba(245,166,35,0.15); display: flex; align-items: center; justify-content: center; font-size: 24px;
+  }
+  .feat-card h3 { color: var(--white); font-size: 18px; font-weight: 600; margin-bottom: 10px; }
+  .feat-card p { color: rgba(255,255,255,0.6); font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  .feat-list { list-style: none; }
+  .feat-list li { font-size: 13px; color: rgba(255,255,255,0.55); padding: 4px 0; padding-left: 18px; position: relative; }
+  .feat-list li::before { content: '✓'; position: absolute; left: 0; color: var(--green); font-size: 12px; }
+
+  /* ─── HOW IT WORKS ─── */
+  .how { background: var(--off-white); }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; margin-top: 50px; position: relative; }
+  .steps::before {
+    content: ''; position: absolute; top: 44px; left: calc(16.66% + 24px); right: calc(16.66% + 24px);
+    height: 2px; background: linear-gradient(90deg, var(--blue), var(--accent));
+  }
+  .step { text-align: center; }
+  .step-num {
+    width: 88px; height: 88px; border-radius: 50%; margin: 0 auto 24px;
+    background: var(--white); border: 3px solid var(--blue);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--blue);
+    box-shadow: 0 0 0 8px rgba(27,108,168,0.08);
+    position: relative; z-index: 1;
+  }
+  .step h3 { font-size: 19px; font-weight: 700; margin-bottom: 10px; }
+  .step p { font-size: 14px; color: var(--text-muted); line-height: 1.65; max-width: 240px; margin: 0 auto; }
+
+  /* ─── TESTIMONIALS ─── */
+  .testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 50px; }
+  .testi-card {
+    background: var(--white); border-radius: var(--radius); padding: 28px;
+    border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s;
+  }
+  .testi-card:hover { box-shadow: var(--shadow); }
+  .testi-stars { color: var(--accent); font-size: 16px; margin-bottom: 16px; letter-spacing: 2px; }
+  .testi-text { font-size: 15px; color: var(--gray-800); line-height: 1.7; margin-bottom: 22px; font-style: italic; }
+  .testi-author { display: flex; align-items: center; gap: 12px; }
+  .testi-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 15px; color: var(--white);
+    font-family: 'Syne', sans-serif;
+  }
+  .testi-name { font-weight: 600; font-size: 14px; }
+  .testi-role { font-size: 12px; color: var(--text-muted); }
+
+  /* ─── PRICING ─── */
+  .pricing { background: var(--off-white); }
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 50px; align-items: start; }
+  .price-card {
+    background: var(--white); border-radius: var(--radius-lg); padding: 36px 30px;
+    border: 1.5px solid var(--gray-200); transition: all 0.25s;
+  }
+  .price-card:hover { border-color: var(--blue); box-shadow: var(--shadow); }
+  .price-card.featured {
+    background: var(--navy); border-color: var(--blue);
+    box-shadow: var(--shadow-lg); transform: translateY(-10px);
+  }
+  .price-popular {
+    display: inline-block; background: var(--accent); color: var(--navy);
+    font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 100px;
+    margin-bottom: 18px; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .price-tier { font-size: 13px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+  .price-card.featured .price-tier { color: rgba(255,255,255,0.5); }
+  .price-num { font-family: 'Syne', sans-serif; font-size: 44px; font-weight: 800; color: var(--navy); }
+  .price-card.featured .price-num { color: var(--white); }
+  .price-period { font-size: 14px; color: var(--text-muted); font-weight: 400; }
+  .price-card.featured .price-period { color: rgba(255,255,255,0.5); }
+  .price-desc { font-size: 14px; color: var(--text-muted); margin: 10px 0 24px; }
+  .price-card.featured .price-desc { color: rgba(255,255,255,0.6); }
+  .price-divider { height: 1px; background: var(--gray-200); margin-bottom: 22px; }
+  .price-card.featured .price-divider { background: rgba(255,255,255,0.1); }
+  .price-feat-list { list-style: none; }
+  .price-feat-list li { font-size: 14px; padding: 7px 0; padding-left: 24px; position: relative; color: var(--text-muted); }
+  .price-card.featured .price-feat-list li { color: rgba(255,255,255,0.75); }
+  .price-feat-list li::before { content: '✓'; position: absolute; left: 0; color: var(--green); font-weight: 600; }
+  .price-feat-list li.no::before { content: '✕'; color: var(--gray-400); }
+  .price-feat-list li.no { color: var(--gray-400); }
+  .price-cta { margin-top: 28px; width: 100%; text-align: center; justify-content: center; }
+
+  /* ─── FINAL CTA ─── */
+  .final-cta {
+    background: linear-gradient(135deg, var(--navy) 0%, #1a3a6e 100%);
+    text-align: center; padding: 100px 0;
+  }
+  .final-cta h2 { font-size: clamp(28px, 4vw, 46px); color: var(--white); margin-bottom: 16px; }
+  .final-cta p { color: rgba(255,255,255,0.65); font-size: 17px; margin-bottom: 38px; max-width: 500px; margin-left: auto; margin-right: auto; }
+  .final-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .trust-line { margin-top: 28px; color: rgba(255,255,255,0.38); font-size: 13px; }
+
+  /* ─── DEMO PAGE ─── */
+  .demo-section { background: var(--off-white); }
+  .demo-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; align-items: center; }
+  .demo-form-card {
+    background: var(--white); border-radius: var(--radius-lg); padding: 42px 40px;
+    box-shadow: var(--shadow); border: 1px solid var(--gray-200);
+  }
+  .form-label { display: block; font-size: 13px; font-weight: 500; color: var(--gray-800); margin-bottom: 6px; }
+  .form-input {
+    width: 100%; padding: 12px 16px; border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm); font-size: 15px; font-family: 'DM Sans', sans-serif;
+    color: var(--text); outline: none; transition: border-color 0.2s; background: var(--off-white);
+  }
+  .form-input:focus { border-color: var(--blue); background: var(--white); }
+  .form-group { margin-bottom: 20px; }
+  .form-select {
+    width: 100%; padding: 12px 16px; border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm); font-size: 15px; font-family: 'DM Sans', sans-serif;
+    color: var(--text); outline: none; background: var(--off-white); cursor: pointer;
+  }
+  .demo-benefit { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 22px; }
+  .demo-benefit-icon {
+    width: 40px; height: 40px; border-radius: 10px; background: rgba(27,108,168,0.1);
+    display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+  }
+  .demo-benefit strong { font-size: 15px; font-weight: 600; display: block; margin-bottom: 3px; }
+  .demo-benefit span { font-size: 14px; color: var(--text-muted); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--navy); color: rgba(255,255,255,0.6);
+    padding: 60px 0 30px;
+  }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+  .footer-brand p { font-size: 14px; line-height: 1.7; margin-top: 14px; max-width: 260px; }
+  .footer-col h4 { color: var(--white); font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; margin-bottom: 18px; }
+  .footer-col a { display: block; font-size: 14px; margin-bottom: 10px; color: rgba(255,255,255,0.55); transition: color 0.2s; }
+  .footer-col a:hover { color: var(--white); }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.1); padding-top: 28px;
+    display: flex; justify-content: space-between; align-items: center; font-size: 13px;
+  }
+  .footer-bottom a { color: rgba(255,255,255,0.4); margin-left: 20px; }
+
+  /* ─── PAGE SECTIONS ─── */
+  .page-section { display: none; }
+  .page-section.active { display: block; }
+  .page-hero {
+    background: var(--navy); padding: 130px 0 70px;
+    text-align: center; color: var(--white);
+  }
+  .page-hero h1 { font-size: 46px; font-weight: 800; margin-bottom: 14px; }
+  .page-hero p { color: rgba(255,255,255,0.6); font-size: 17px; max-width: 540px; margin: 0 auto; }
+
+  /* ─── FEATURE DETAIL ─── */
+  .feat-detail {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 50px;
+    align-items: center; padding: 60px 0; border-bottom: 1px solid var(--gray-200);
+  }
+  .feat-detail:last-child { border-bottom: none; }
+  .feat-detail:nth-child(even) .feat-detail-text { order: 2; }
+  .feat-detail:nth-child(even) .feat-detail-visual { order: 1; }
+  .feat-detail-tag { display: inline-block; background: rgba(27,108,168,0.1); color: var(--blue); font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
+  .feat-detail h2 { font-size: 28px; font-weight: 700; margin-bottom: 14px; }
+  .feat-detail p { font-size: 15px; color: var(--text-muted); margin-bottom: 20px; }
+  .feat-benefits { list-style: none; }
+  .feat-benefits li { font-size: 14px; padding: 6px 0; padding-left: 22px; position: relative; color: var(--gray-800); }
+  .feat-benefits li::before { content: '→'; position: absolute; left: 0; color: var(--blue); }
+  .use-case-box {
+    background: var(--off-white); border-radius: var(--radius); padding: 18px 22px;
+    border-left: 4px solid var(--accent); margin-top: 20px;
+  }
+  .use-case-box strong { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; display: block; margin-bottom: 6px; }
+  .use-case-box p { font-size: 14px; color: var(--gray-800); margin: 0; }
+  .feat-visual-card {
+    background: var(--navy); border-radius: var(--radius-lg); padding: 32px;
+    color: var(--white); box-shadow: var(--shadow-lg);
+  }
+
+  /* ─── COMPARISON TABLE ─── */
+  .compare-table { width: 100%; border-collapse: collapse; margin-top: 50px; }
+  .compare-table th, .compare-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--gray-200); font-size: 14px; }
+  .compare-table th { background: var(--navy); color: var(--white); font-family: 'Syne', sans-serif; font-size: 13px; }
+  .compare-table th:first-child { border-radius: 12px 0 0 0; }
+  .compare-table th:last-child { border-radius: 0 12px 0 0; }
+  .compare-table tr:hover td { background: var(--gray-100); }
+  .compare-table .check { color: var(--green); font-weight: 600; }
+  .compare-table .cross { color: var(--gray-400); }
+  .compare-table .highlight-col { background: rgba(27,108,168,0.05); }
+
+  /* ─── BLOG ─── */
+  .blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 50px; }
+  .blog-card {
+    background: var(--white); border-radius: var(--radius); overflow: hidden;
+    border: 1px solid var(--gray-200); transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .blog-card:hover { box-shadow: var(--shadow); transform: translateY(-4px); }
+  .blog-thumb { height: 180px; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+  .blog-body { padding: 22px 24px; }
+  .blog-cat { font-size: 11px; font-weight: 600; color: var(--blue); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+  .blog-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 10px; line-height: 1.4; }
+  .blog-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+  .blog-meta { display: flex; gap: 12px; margin-top: 16px; font-size: 12px; color: var(--gray-400); }
+
+  /* ─── ABOUT ─── */
+  .about-values { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 50px; }
+  .value-card {
+    background: var(--white); border-radius: var(--radius); padding: 28px;
+    border: 1px solid var(--gray-200); text-align: center;
+  }
+  .value-icon { font-size: 36px; margin-bottom: 16px; }
+  .value-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+  .value-card p { font-size: 14px; color: var(--text-muted); line-height: 1.65; }
+  .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 40px; }
+  .team-card { text-align: center; }
+  .team-avatar {
+    width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--white);
+  }
+  .team-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .team-card span { font-size: 13px; color: var(--text-muted); }
+
+  /* ─── CONTACT ─── */
+  .contact-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+  .contact-info-item { display: flex; gap: 16px; margin-bottom: 28px; align-items: flex-start; }
+  .contact-icon {
+    width: 46px; height: 46px; border-radius: 10px; background: rgba(27,108,168,0.1);
+    display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+  }
+  .contact-info-item h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .contact-info-item p { font-size: 14px; color: var(--text-muted); }
+  textarea.form-input { resize: vertical; min-height: 130px; }
+
+  /* ─── MOBILE ─── */
+  @media (max-width: 900px) {
+    .hero-inner, .grid-2, .solution-grid, .demo-inner, .contact-inner, .feat-detail { grid-template-columns: 1fr; }
+    .grid-3, .feat-grid, .problem-grid, .testi-grid, .blog-grid, .about-values { grid-template-columns: 1fr 1fr; }
+    .grid-4, .team-grid, .pricing-grid { grid-template-columns: 1fr 1fr; }
+    .steps { grid-template-columns: 1fr; }
+    .steps::before { display: none; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .price-card.featured { transform: none; }
+    nav .nav-links { display: none; }
+    .feat-detail:nth-child(even) .feat-detail-text,
+    .feat-detail:nth-child(even) .feat-detail-visual { order: unset; }
+  }
+  @media (max-width: 600px) {
+    .grid-3, .feat-grid, .problem-grid, .testi-grid, .blog-grid, .about-values, .grid-4, .team-grid, .pricing-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .section { padding: 60px 0; }
+    .hero { padding: 100px 0 60px; }
+  }
+
+  /* ─── PAGE TABS ─── */
+  .page-root > *:not(nav):not(#page-home):not(#page-features):not(#page-pricing):not(#page-demo):not(#page-about):not(#page-contact):not(#page-blog):not(footer) { display: none; }
+
+  /* scroll offset for fixed nav */
+  section[id] { scroll-margin-top: 66px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo" onclick="showPage('home')">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" fill="none" stroke="#0B1F3A" stroke-width="2.2" stroke-linecap="round"/><path d="M8 7h8M8 11h6" stroke="#0B1F3A" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+      </div>
+      LibraryOS
+    </a>
+    <div class="nav-links">
+      <a href="#" onclick="showPage('home')">Home</a>
+      <a href="#" onclick="showPage('features')">Features</a>
+      <a href="#" onclick="showPage('pricing')">Pricing</a>
+      <a href="#" onclick="showPage('blog')">Blog</a>
+      <a href="#" onclick="showPage('about')">About</a>
+      <a href="#" onclick="showPage('contact')">Contact</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#" class="btn btn-outline" onclick="showPage('demo')">Book Demo</a>
+      <a href="#" class="btn btn-primary" onclick="showPage('demo')">Start Free Trial</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-root">
+
+<!-- ══════════════════════════════ HOME ══════════════════════════════ -->
+<div id="page-home" class="page-section active">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-badge">
+          <span></span>
+          Trusted by 500+ institutions across South Asia
+        </div>
+        <h1>Run Your Library<br><span class="highlight">Smarter, Not Harder</span></h1>
+        <p>LibraryOS replaces messy registers, lost slips, and late-return headaches with a simple, powerful system your staff can learn in a single afternoon.</p>
+        <div class="hero-ctas">
+          <a href="#" class="btn btn-primary" onclick="showPage('demo')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 3l14 9-14 9V3z"/></svg>
+            Start Free Trial — No Card Needed
+          </a>
+          <a href="#" class="btn btn-outline" onclick="showPage('demo')">Book a Live Demo</a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-num">500+</div>
+            <div class="hero-stat-label">Institutions</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">2M+</div>
+            <div class="hero-stat-label">Books Tracked</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">97%</div>
+            <div class="hero-stat-label">Satisfaction Rate</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="dashboard-frame">
+          <div class="db-topbar">
+            <div class="db-dots">
+              <div class="db-dot" style="background:#E84343"></div>
+              <div class="db-dot" style="background:#F5A623"></div>
+              <div class="db-dot" style="background:#17B978"></div>
+            </div>
+            <span class="db-title">LibraryOS — Dashboard</span>
+            <span style="font-size:11px;color:rgba(255,255,255,0.3)">Today</span>
+          </div>
+          <div class="db-body">
+            <div class="db-row">
+              <div class="db-card">
+                <div class="db-card-dot" style="background:#1B6CA8"></div>
+                <div class="db-card-num">2,847</div>
+                <div class="db-card-label">Total Books</div>
+              </div>
+              <div class="db-card">
+                <div class="db-card-dot" style="background:#17B978"></div>
+                <div class="db-card-num">184</div>
+                <div class="db-card-label">Issued Today</div>
+              </div>
+              <div class="db-card">
+                <div class="db-card-dot" style="background:#F5A623"></div>
+                <div class="db-card-num">23</div>
+                <div class="db-card-label">Overdue</div>
+              </div>
+              <div class="db-card">
+                <div class="db-card-dot" style="background:#E84343"></div>
+                <div class="db-card-num">৳4,200</div>
+                <div class="db-card-label">Fines Due</div>
+              </div>
+            </div>
+            <div class="db-table">
+              <div class="db-table-head">
+                <span>Book Title</span>
+                <span>Member</span>
+                <span>Due Date</span>
+                <span>Status</span>
+              </div>
+              <div class="db-table-row">
+                <span style="font-size:12px;font-weight:500">Physics Vol. II</span>
+                <span style="color:#4A6580">Rahela K.</span>
+                <span style="color:#4A6580">Jun 12</span>
+                <span><span class="db-badge badge-green">Returned</span></span>
+              </div>
+              <div class="db-table-row">
+                <span style="font-size:12px;font-weight:500">Bangla Grammar</span>
+                <span style="color:#4A6580">Tanvir A.</span>
+                <span style="color:#4A6580">Jun 8</span>
+                <span><span class="db-badge badge-amber">Due Soon</span></span>
+              </div>
+              <div class="db-table-row">
+                <span style="font-size:12px;font-weight:500">World History</span>
+                <span style="color:#4A6580">Fatema B.</span>
+                <span style="color:#4A6580">Jun 2</span>
+                <span><span class="db-badge badge-red">Overdue</span></span>
+              </div>
+              <div class="db-table-row">
+                <span style="font-size:12px;font-weight:500">Chemistry Lab</span>
+                <span style="color:#4A6580">Shuvo M.</span>
+                <span style="color:#4A6580">Jun 15</span>
+                <span><span class="db-badge badge-green">Active</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<section style="background:#F7F9FC;padding:28px 0;border-bottom:1px solid #EEF2F7;">
+  <div class="container">
+    <div style="display:flex;align-items:center;gap:40px;flex-wrap:wrap;justify-content:center">
+      <span style="font-size:13px;color:#8FA3BB;font-weight:500;text-transform:uppercase;letter-spacing:.06em">Trusted by</span>
+      <span style="font-size:15px;font-weight:600;color:#4A6580">🏫 Dhaka University</span>
+      <span style="font-size:15px;font-weight:600;color:#4A6580">📚 BRAC Education</span>
+      <span style="font-size:15px;font-weight:600;color:#4A6580">🎓 BUET Library</span>
+      <span style="font-size:15px;font-weight:600;color:#4A6580">🏛 NSU Library</span>
+      <span style="font-size:15px;font-weight:600;color:#4A6580">📖 City College, Ctg</span>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEMS -->
+<section class="section problems">
+  <div class="container text-center">
+    <div class="tag">The Problem</div>
+    <h2 class="section-title">Manual Systems Are Costing You Time, Money, and Books</h2>
+    <p class="section-sub">Every day, librarians across Bangladesh waste hours on tasks that should take minutes. Sound familiar?</p>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-icon">📋</div>
+        <h3>Paper Registers Get Lost</h3>
+        <p>Handwritten issue records disappear or get damaged. You have no idea who has which book — until it's too late.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">⏱️</div>
+        <h3>Calculating Fines Takes Forever</h3>
+        <p>Staff spend 30+ minutes per day manually counting overdue days and arguing with students about fine amounts.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🔍</div>
+        <h3>No Idea Where Books Are</h3>
+        <p>"Is this book available?" — nobody knows without physically checking shelves. Students leave frustrated.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">📊</div>
+        <h3>Zero Reporting or Insights</h3>
+        <p>You can't tell your principal how many books were issued this year, or which titles are most popular.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">👤</div>
+        <h3>Member Records Are a Mess</h3>
+        <p>Student IDs, contact numbers, and borrowing history scattered across multiple notebooks with no way to search.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🌧️</div>
+        <h3>Monsoon Season Destroys Data</h3>
+        <p>One flood, one fire, one spilled tea — and years of borrowing records are gone forever with no backup.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="section" style="background:#fff">
+  <div class="container">
+    <div class="solution-grid">
+      <div>
+        <div class="tag tag-green">The Solution</div>
+        <h2 class="section-title">Everything Your Library Needs, In One Simple System</h2>
+        <p class="section-sub" style="margin-bottom:36px">LibraryOS was built specifically for schools, colleges, and libraries in South Asia — with Bangla support, offline mode, and pricing that makes sense.</p>
+        <div class="solution-item">
+          <div class="sol-icon">📱</div>
+          <div>
+            <div class="sol-item-title">Works on Any Device</div>
+            <div class="sol-item-text">Laptop, tablet, or phone — no special hardware needed. Works on ৳15,000 computers.</div>
+          </div>
+        </div>
+        <div class="solution-item">
+          <div class="sol-icon">🔌</div>
+          <div>
+            <div class="sol-item-title">Offline Mode Available</div>
+            <div class="sol-item-text">Poor internet? No problem. LibraryOS syncs automatically when connection returns.</div>
+          </div>
+        </div>
+        <div class="solution-item">
+          <div class="sol-icon">🇧🇩</div>
+          <div>
+            <div class="sol-item-title">Made for Bangladesh</div>
+            <div class="sol-item-text">Bangla UI, local currency fines, local calendar support, and customer support in Bangla.</div>
+          </div>
+        </div>
+        <div class="solution-item">
+          <div class="sol-icon">☁️</div>
+          <div>
+            <div class="sol-item-title">Cloud Backup Always On</div>
+            <div class="sol-item-text">Your data is automatically saved every hour. No floods, fires, or accidents can destroy it.</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg,#0B1F3A,#1a3a6e);border-radius:24px;padding:36px;color:#fff">
+        <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:28px;font-weight:500;text-transform:uppercase;letter-spacing:.06em">Before & After LibraryOS</div>
+        <div style="margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+            <span style="color:rgba(255,255,255,0.6)">Issue a book</span>
+            <span style="color:#F5A623;font-weight:600">5 sec vs 4 min</span>
+          </div>
+          <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px">
+            <div style="width:95%;height:100%;background:#F5A623;border-radius:3px"></div>
+          </div>
+        </div>
+        <div style="margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+            <span style="color:rgba(255,255,255,0.6)">Calculate fine</span>
+            <span style="color:#17B978;font-weight:600">Instant vs 5 min</span>
+          </div>
+          <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px">
+            <div style="width:98%;height:100%;background:#17B978;border-radius:3px"></div>
+          </div>
+        </div>
+        <div style="margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+            <span style="color:rgba(255,255,255,0.6)">Find a book</span>
+            <span style="color:#2E8FD8;font-weight:600">3 sec vs 10 min</span>
+          </div>
+          <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px">
+            <div style="width:97%;height:100%;background:#2E8FD8;border-radius:3px"></div>
+          </div>
+        </div>
+        <div style="margin-bottom:30px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+            <span style="color:rgba(255,255,255,0.6)">Monthly report</span>
+            <span style="color:#F5A623;font-weight:600">1 click vs 2 days</span>
+          </div>
+          <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px">
+            <div style="width:99%;height:100%;background:#F5A623;border-radius:3px"></div>
+          </div>
+        </div>
+        <div style="background:rgba(23,185,120,0.15);border-radius:12px;padding:18px;border:1px solid rgba(23,185,120,0.3)">
+          <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:4px">Average time saved per week</div>
+          <div style="font-size:36px;font-weight:800;font-family:'Syne',sans-serif;color:#fff">12+ Hours</div>
+          <div style="font-size:13px;color:rgba(23,185,120,0.9)">Per librarian, per week</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section features">
+  <div class="container text-center">
+    <div class="tag">Features</div>
+    <h2 class="section-title">Everything You Need. Nothing You Don't.</h2>
+    <p class="section-sub">Built for librarians — not software engineers. If you can use WhatsApp, you can use LibraryOS.</p>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon">📚</div>
+        <h3>Book Management</h3>
+        <p>Add, search, and organize your entire catalog with barcode scanning or manual entry. Works in Bangla and English.</p>
+        <ul class="feat-list">
+          <li>Barcode/ISBN scanning</li>
+          <li>Category & shelf location</li>
+          <li>Multiple copies tracking</li>
+          <li>Duplicate detection</li>
+        </ul>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">👥</div>
+        <h3>Member Management</h3>
+        <p>Manage student, faculty, and public member profiles with photos, IDs, and complete borrowing history.</p>
+        <ul class="feat-list">
+          <li>Photo ID cards (printable)</li>
+          <li>Bulk import from Excel</li>
+          <li>Class/department grouping</li>
+          <li>Borrowing history per member</li>
+        </ul>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔄</div>
+        <h3>Issue & Return Tracking</h3>
+        <p>Issue or return a book in under 10 seconds. The system tracks everything automatically with no manual calculation.</p>
+        <ul class="feat-list">
+          <li>One-scan issue & return</li>
+          <li>Automatic due date setting</li>
+          <li>SMS/email reminders</li>
+          <li>Renewal requests</li>
+        </ul>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">💰</div>
+        <h3>Fine Calculation</h3>
+        <p>Never argue about fines again. The system calculates overdue fines automatically and tracks who has paid.</p>
+        <ul class="feat-list">
+          <li>Auto daily fine calculation</li>
+          <li>Customizable fine rates</li>
+          <li>Payment receipt printing</li>
+          <li>Fine waiver option</li>
+        </ul>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📊</div>
+        <h3>Reports & Analytics</h3>
+        <p>Get monthly reports your principal will love — most-read books, active members, overdue trends, and fine collections.</p>
+        <ul class="feat-list">
+          <li>PDF & Excel export</li>
+          <li>Monthly/yearly summaries</li>
+          <li>Most popular books chart</li>
+          <li>Custom date range reports</li>
+        </ul>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🌐</div>
+        <h3>Online Catalog</h3>
+        <p>Students can search book availability from their phones before visiting the library — reducing unnecessary trips.</p>
+        <ul class="feat-list">
+          <li>Public search portal</li>
+          <li>Real-time availability</li>
+          <li>Book reservation system</li>
+          <li>QR code book cards</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section how">
+  <div class="container text-center">
+    <div class="tag tag-green">Simple Setup</div>
+    <h2 class="section-title">Up and Running in 3 Simple Steps</h2>
+    <p class="section-sub">No IT team required. No training courses. Our support team walks you through everything on Day 1.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Sign Up & Add Your Books</h3>
+        <p>Create your account in 2 minutes. Import your existing catalog from Excel, or start adding books one by one with our guided form.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Register Your Members</h3>
+        <p>Add students, teachers, or members — individually or bulk upload your whole class list from a spreadsheet. Done in minutes.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Start Issuing & Returning</h3>
+        <p>Scan the barcode (or type the book code), select the member, and click Issue. That's it. The system handles the rest.</p>
+      </div>
+    </div>
+    <div style="margin-top:48px">
+      <a href="#" class="btn btn-blue" onclick="showPage('demo')">Start Your Free 30-Day Trial</a>
+      <p style="font-size:13px;color:var(--text-muted);margin-top:12px">No credit card required • Cancel anytime • Setup support included</p>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section" style="background:#fff">
+  <div class="container text-center">
+    <div class="tag tag-accent">Testimonials</div>
+    <h2 class="section-title">Loved by Librarians Across Bangladesh</h2>
+    <p class="section-sub">Real feedback from real librarians who switched from paper to LibraryOS.</p>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Before LibraryOS, I spent my whole morning just finding overdue books. Now I open the dashboard and everything is right there. My principal is impressed by the monthly reports too."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:#1B6CA8">RK</div>
+          <div>
+            <div class="testi-name">Rahima Khanam</div>
+            <div class="testi-role">Head Librarian, Motijheel Girls' School, Dhaka</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"We have over 18,000 books and 3,000 students. Managing that was a nightmare with registers. LibraryOS handled our full catalog import in one afternoon. The barcode scanner works perfectly."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:#17B978">MA</div>
+          <div>
+            <div class="testi-name">Moinul Ahsan</div>
+            <div class="testi-role">Chief Librarian, Comilla Victoria College</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"The Bangla interface made adoption easy for our older staff. Customer support responded within 1 hour every time I had a question. Best investment our library has made in 10 years."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:#F5A623;color:#0B1F3A">TB</div>
+          <div>
+            <div class="testi-name">Tabassum Binte Salam</div>
+            <div class="testi-role">Librarian, North South University, Dhaka</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING PREVIEW -->
+<section class="section pricing">
+  <div class="container text-center">
+    <div class="tag">Pricing</div>
+    <h2 class="section-title">Transparent Pricing — No Surprises</h2>
+    <p class="section-sub">Every plan includes free setup support, data migration help, and a full 30-day free trial.</p>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-tier">Basic</div>
+        <div class="price-num">৳999 <span class="price-period">/month</span></div>
+        <p class="price-desc">Perfect for small libraries and madrasa libraries up to 5,000 books.</p>
+        <div class="price-divider"></div>
+        <ul class="price-feat-list">
+          <li>Up to 5,000 books</li>
+          <li>Up to 500 members</li>
+          <li>Issue & Return tracking</li>
+          <li>Automatic fine calculation</li>
+          <li>Basic monthly reports</li>
+          <li class="no">Barcode scanner support</li>
+          <li class="no">SMS reminders</li>
+          <li class="no">Custom member ID cards</li>
+        </ul>
+        <a href="#" class="btn btn-ghost price-cta" onclick="showPage('demo')">Start Free Trial</a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-popular">Most Popular</div>
+        <div class="price-tier">Standard</div>
+        <div class="price-num">৳2,499 <span class="price-period">/month</span></div>
+        <p class="price-desc">Built for schools and colleges with up to 25,000 books and multiple branches.</p>
+        <div class="price-divider"></div>
+        <ul class="price-feat-list">
+          <li>Up to 25,000 books</li>
+          <li>Up to 3,000 members</li>
+          <li>Issue & Return tracking</li>
+          <li>Automatic fine calculation</li>
+          <li>Advanced reports & PDF export</li>
+          <li>Barcode scanner support</li>
+          <li>SMS reminders</li>
+          <li>Custom member ID cards</li>
+        </ul>
+        <a href="#" class="btn btn-primary price-cta" onclick="showPage('demo')">Start Free Trial</a>
+      </div>
+      <div class="price-card">
+        <div class="price-tier">Premium</div>
+        <div class="price-num">৳5,999 <span class="price-period">/month</span></div>
+        <p class="price-desc">For universities and large public libraries with unlimited books and advanced needs.</p>
+        <div class="price-divider"></div>
+        <ul class="price-feat-list">
+          <li>Unlimited books</li>
+          <li>Unlimited members</li>
+          <li>Issue & Return tracking</li>
+          <li>Automatic fine calculation</li>
+          <li>Full analytics dashboard</li>
+          <li>Barcode scanner support</li>
+          <li>SMS + Email reminders</li>
+          <li>Multi-branch management</li>
+        </ul>
+        <a href="#" class="btn btn-ghost price-cta" onclick="showPage('demo')">Start Free Trial</a>
+      </div>
+    </div>
+    <p style="margin-top:28px;font-size:14px;color:var(--text-muted)">
+      Need a custom plan for your institution? <a href="#" onclick="showPage('contact')" style="color:var(--blue);font-weight:500">Contact us for NGO or government pricing →</a>
+    </p>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container">
+    <div class="tag" style="background:rgba(245,166,35,0.15);color:var(--accent-lt)">Get Started Today</div>
+    <h2>Your Library Can Be This Organized by Tomorrow</h2>
+    <p>Join 500+ institutions who have already modernized their libraries with LibraryOS. Setup takes less than a day — and we help every step of the way.</p>
+    <div class="final-btns">
+      <a href="#" class="btn btn-primary" onclick="showPage('demo')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 3l14 9-14 9V3z"/></svg>
+        Start 30-Day Free Trial
+      </a>
+      <a href="#" class="btn btn-outline" onclick="showPage('demo')">Schedule a Live Demo</a>
+    </div>
+    <p class="trust-line">✓ No credit card &nbsp;&nbsp; ✓ Free data migration &nbsp;&nbsp; ✓ Setup support included &nbsp;&nbsp; ✓ Cancel anytime</p>
+  </div>
+</section>
+
+</div><!-- /page-home -->
+
+<!-- ══════════════════════════════ FEATURES PAGE ══════════════════════════════ -->
+<div id="page-features" class="page-section">
+<div class="page-hero">
+  <div class="container">
+    <div class="tag" style="background:rgba(245,166,35,0.15);color:var(--accent-lt)">Features</div>
+    <h1>Everything Your Library Needs</h1>
+    <p>Six powerful modules — each designed to replace a painful manual process with something that just works.</p>
+  </div>
+</div>
+<section class="section" style="background:#fff">
+  <div class="container">
+
+    <div class="feat-detail">
+      <div class="feat-detail-text">
+        <div class="feat-detail-tag">Module 01</div>
+        <h2>Book Management</h2>
+        <p>Your entire catalog, organized and searchable in seconds. Add books by scanning their barcode or typing the ISBN — LibraryOS pulls the title, author, and cover from our global database automatically.</p>
+        <ul class="feat-benefits">
+          <li>Search by title, author, ISBN, category, or shelf number — results appear as you type</li>
+          <li>Know exactly how many copies you have and how many are currently issued</li>
+          <li>Tag books by subject, curriculum standard, or reading level</li>
+          <li>Flag rare, damaged, or restricted books with access control</li>
+          <li>Bulk import your existing inventory from any Excel spreadsheet</li>
+        </ul>
+        <div class="use-case-box">
+          <strong>Real-World Use Case</strong>
+          <p>A student asks "Do you have any books on Bangladesh's Liberation War?" — your librarian types three words and sees 14 matching titles with their shelf locations and availability. Done in 8 seconds.</p>
+        </div>
+      </div>
+      <div class="feat-detail-visual">
+        <div class="feat-visual-card">
+          <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:18px">BOOK SEARCH</div>
+          <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:14px;color:rgba(255,255,255,0.7)">🔍 Liberation War Bangladesh...</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:12px;display:flex;gap:12px">
+              <div style="width:36px;height:48px;background:#F5A623;border-radius:4px;flex-shrink:0"></div>
+              <div><div style="font-size:13px;font-weight:600;color:#fff">Ekattorer Dinguli</div><div style="font-size:12px;color:rgba(255,255,255,0.5)">Jahanara Imam · Shelf B-14</div><div style="margin-top:4px"><span class="db-badge badge-green">3 available</span></div></div>
+            </div>
+            <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:12px;display:flex;gap:12px">
+              <div style="width:36px;height:48px;background:#2E8FD8;border-radius:4px;flex-shrink:0"></div>
+              <div><div style="font-size:13px;font-weight:600;color:#fff">A History of Bangladesh</div><div style="font-size:12px;color:rgba(255,255,255,0.5)">Willem van Schendel · Shelf A-3</div><div style="margin-top:4px"><span class="db-badge badge-amber">1 left</span></div></div>
+            </div>
+            <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:12px;display:flex;gap:12px">
+              <div style="width:36px;height:48px;background:#17B978;border-radius:4px;flex-shrink:0"></div>
+              <div><div style="font-size:13px;font-weight:600;color:#fff">The Blood Telegram</div><div style="font-size:12px;color:rgba(255,255,255,0.5)">Gary J. Bass · Shelf C-7</div><div style="margin-top:4px"><span class="db-badge badge-red">Issued (due Jun 20)</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feat-detail">
+      <div class="feat-detail-text">
+        <div class="feat-detail-tag">Module 02</div>
+        <h2>Member Management</h2>
+        <p>One central place for every student, teacher, and member profile. Know their borrowing history, outstanding fines, and current issues at a glance — no digging through registers.</p>
+        <ul class="feat-benefits">
+          <li>Photo ID with auto-generated library card number</li>
+          <li>Full borrowing history — every book, ever issued</li>
+          <li>Bulk import from school's student roll (Excel/CSV)</li>
+          <li>Group members by class, batch, or department</li>
+          <li>Printable ID cards with QR code for fast scanning</li>
+        </ul>
+        <div class="use-case-box">
+          <strong>Real-World Use Case</strong>
+          <p>A student claims they returned a book last month. You search their profile and see their complete history with dates — the disputed book is still listed as issued. No argument needed.</p>
+        </div>
+      </div>
+      <div class="feat-detail-visual">
+        <div class="feat-visual-card">
+          <div style="display:flex;gap:14px;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.1)">
+            <div style="width:54px;height:54px;border-radius:50%;background:#F5A623;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:#0B1F3A;flex-shrink:0">RH</div>
+            <div><div style="font-weight:600;color:#fff;font-size:16px">Rakibul Hasan</div><div style="font-size:13px;color:rgba(255,255,255,0.5)">Class XI · Science · ID: LIB-2024-0847</div><div style="margin-top:4px"><span class="db-badge badge-green">Active Member</span></div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+            <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:700;color:#fff;font-family:'Syne',sans-serif">12</div><div style="font-size:11px;color:rgba(255,255,255,0.4)">Books Borrowed</div></div>
+            <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:700;color:#F5A623;font-family:'Syne',sans-serif">৳50</div><div style="font-size:11px;color:rgba(255,255,255,0.4)">Fine Due</div></div>
+          </div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px">CURRENT ISSUES</div>
+          <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;font-size:13px;display:flex;justify-content:space-between;align-items:center"><span style="color:#fff">Higher Math Vol. 2</span><span class="db-badge badge-amber">Due Jun 18</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feat-detail">
+      <div class="feat-detail-text">
+        <div class="feat-detail-tag">Module 03</div>
+        <h2>Issue & Return Tracking</h2>
+        <p>The fastest issue-and-return workflow you've ever experienced. Scan a book, scan a member card, click Issue. The entire transaction takes under 10 seconds.</p>
+        <ul class="feat-benefits">
+          <li>10-second issue process — no typing needed</li>
+          <li>Automatic due date calculation based on your rules</li>
+          <li>Alerts when a member has outstanding fines before issuing</li>
+          <li>SMS or email reminder 2 days before due date</li>
+          <li>Book reservation for currently-issued titles</li>
+        </ul>
+        <div class="use-case-box">
+          <strong>Real-World Use Case</strong>
+          <p>During the exam rush, 40 students come to borrow books in 30 minutes. With LibraryOS, the librarian handles each transaction in under 15 seconds — no queue, no frustration.</p>
+        </div>
+      </div>
+      <div class="feat-detail-visual">
+        <div class="feat-visual-card">
+          <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:18px;font-weight:500">ISSUE A BOOK</div>
+          <div style="display:flex;gap:10px;margin-bottom:12px">
+            <div style="flex:1;background:rgba(255,255,255,0.1);border-radius:8px;padding:10px;text-align:center"><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px">BOOK SCANNED</div><div style="font-size:13px;color:#17B978;font-weight:600">✓ Physics Vol. II</div></div>
+            <div style="flex:1;background:rgba(255,255,255,0.1);border-radius:8px;padding:10px;text-align:center"><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px">MEMBER</div><div style="font-size:13px;color:#17B978;font-weight:600">✓ Sadia Islam</div></div>
+          </div>
+          <div style="background:rgba(23,185,120,0.15);border:1px solid rgba(23,185,120,0.3);border-radius:8px;padding:12px;margin-bottom:12px">
+            <div style="font-size:13px;color:#fff;font-weight:500">All clear — no outstanding fines</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px">Due date: June 21, 2025</div>
+          </div>
+          <div style="background:#F5A623;border-radius:8px;padding:12px;text-align:center;font-weight:600;color:#0B1F3A;cursor:pointer;font-size:15px">Issue Book →</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feat-detail">
+      <div class="feat-detail-text">
+        <div class="feat-detail-tag">Module 04</div>
+        <h2>Automatic Fine Calculation</h2>
+        <p>Stop arguing about fines. LibraryOS calculates the exact amount owed based on your own rules — per-day rates, grace periods, weekend exclusions — automatically.</p>
+        <ul class="feat-benefits">
+          <li>Custom fine rates per day (e.g. ৳2/day for students, ৳5/day for faculty)</li>
+          <li>Grace period settings (e.g. no fine for first 2 days overdue)</li>
+          <li>Fine waiver option for special cases</li>
+          <li>Printable fine receipts with institution letterhead</li>
+          <li>Fine payment history and collection reports</li>
+        </ul>
+        <div class="use-case-box">
+          <strong>Real-World Use Case</strong>
+          <p>A student returns a book 18 days late. Previously, a librarian would count days on a calendar and face arguments. Now the system shows ৳36 due — clear, undeniable, and professionally printed.</p>
+        </div>
+      </div>
+      <div class="feat-detail-visual">
+        <div class="feat-visual-card">
+          <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:18px">FINE CALCULATION</div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px"><span style="color:rgba(255,255,255,0.6)">Book returned</span><span style="color:#fff">World History</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px"><span style="color:rgba(255,255,255,0.6)">Due date</span><span style="color:#fff">June 2, 2025</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px"><span style="color:rgba(255,255,255,0.6)">Return date</span><span style="color:#fff">June 20, 2025</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px"><span style="color:rgba(255,255,255,0.6)">Days overdue</span><span style="color:#E84343;font-weight:600">18 days</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:14px"><span style="color:rgba(255,255,255,0.6)">Rate</span><span style="color:#fff">৳2 per day</span></div>
+          <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:14px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:14px;color:rgba(255,255,255,0.6)">Total Fine Due</span>
+            <span style="font-size:28px;font-weight:800;font-family:'Syne',sans-serif;color:#F5A623">৳36</span>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px">
+            <div style="flex:1;background:#17B978;border-radius:8px;padding:10px;text-align:center;font-size:13px;font-weight:600;color:#fff;cursor:pointer">Mark Paid</div>
+            <div style="flex:1;background:rgba(255,255,255,0.1);border-radius:8px;padding:10px;text-align:center;font-size:13px;color:rgba(255,255,255,0.6);cursor:pointer">Print Receipt</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feat-detail">
+      <div class="feat-detail-text">
+        <div class="feat-detail-tag">Module 05</div>
+        <h2>Reports & Analytics</h2>
+        <p>Know exactly what's happening in your library — what's popular, who's overdue, how many fines were collected, and more. Generate PDF reports in one click for your principal or management.</p>
+        <ul class="feat-benefits">
+          <li>Monthly summary reports — books issued, returned, fines collected</li>
+          <li>Most borrowed books list — know what students love</li>
+          <li>Overdue report with member contact details</li>
+          <li>New acquisition reports for budget planning</li>
+          <li>Export to Excel for custom analysis</li>
+        </ul>
+        <div class="use-case-box">
+          <strong>Real-World Use Case</strong>
+          <p>It's the end of the academic year. Instead of spending 2 days compiling records, the librarian clicks "Annual Report," selects the date range, and downloads a professional PDF in 30 seconds.</p>
+        </div>
+      </div>
+      <div class="feat-detail-visual">
+        <div class="feat-visual-card">
+          <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:18px">JUNE 2025 SUMMARY</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+            <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:12px;text-align:center"><div style="font-size:26px;font-weight:700;color:#fff;font-family:'Syne',sans-serif">847</div><div style="font-size:11px;color:rgba(255,255,255,0.4)">Books Issued</div></div>
+            <div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:12px;text-align:center"><div style="font-size:26px;font-weight:700;color:#17B978;font-family:'Syne',sans-serif">৳3,420</div><div style="font-size:11px;color:rgba(255,255,255,0.4)">Fines Collected</div></div>
+          </div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px">TOP BOOKS THIS MONTH</div>
+          <div style="display:flex;flex-direction:column;gap:7px">
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:13px;color:#fff;width:18px">1.</span><div style="flex:1;height:6px;background:rgba(255,255,255,0.1);border-radius:3px"><div style="width:92%;height:100%;background:#F5A623;border-radius:3px"></div></div><span style="font-size:12px;color:rgba(255,255,255,0.5)">92 issues</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:13px;color:#fff;width:18px">2.</span><div style="flex:1;height:6px;background:rgba(255,255,255,0.1);border-radius:3px"><div style="width:74%;height:100%;background:#2E8FD8;border-radius:3px"></div></div><span style="font-size:12px;color:rgba(255,255,255,0.5)">74 issues</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:13px;color:#fff;width:18px">3.</span><div style="flex:1;height:6px;background:rgba(255,255,255,0.1);border-radius:3px"><div style="width:58%;height:100%;background:#17B978;border-radius:3px"></div></div><span style="font-size:12px;color:rgba(255,255,255,0.5)">58 issues</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<section class="final-cta" style="padding:70px 0">
+  <div class="container text-center">
+    <h2 style="font-size:34px">Ready to see all features in action?</h2>
+    <p>Book a 30-minute live demo — we'll show you everything using your own library's setup.</p>
+    <div class="final-btns" style="margin-top:28px">
+      <a href="#" class="btn btn-primary" onclick="showPage('demo')">Book a Live Demo</a>
+      <a href="#" class="btn btn-outline" onclick="showPage('demo')">Start Free Trial</a>
+    </div>
+  </div>
+</section>
+</div><!-- /page-features -->
+
+<!-- ══════════════════════════════ PRICING PAGE ══════════════════════════════ -->
+<div id="page-pricing" class="page-section">
+<div class="page-hero">
+  <div class="container">
+    <div class="tag" style="background:rgba(245,166,35,0.15);color:var(--accent-lt)">Pricing</div>
+    <h1>Simple, Honest Pricing</h1>
+    <p>All plans include a 30-day free trial, free setup support, and free data migration. No hidden fees.</p>
+  </div>
+</div>
+<section class="section pricing" style="background:var(--off-white)">
+  <div class="container">
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-tier">Basic</div>
+        <div class="price-num">৳999 <span class="price-period">/month</span></div>
+        <p class="price-desc">Ideal for small school libraries, madrasa libraries, or community libraries just getting started.</p>
+        <div class="price-divider"></div>
+        <ul class="price-feat-list">
+          <li>Up to 5,000 books</li>
+          <li>Up to 500 members</li>
+          <li>Issue & Return management</li>
+          <li>Automatic fine calculation</li>
+          <li>Basic monthly reports</li>
+          <li>Cloud backup (daily)</li>
+          <li>Email support (48hr response)</li>
+          <li class="no">Barcode scanner support</li>
+          <li class="no">SMS reminders</li>
+          <li class="no">Member ID card printing</li>
+          <li class="no">Multi-branch</li>
+          <li class="no">API access</li>
+        </ul>
+        <a href="#" class="btn btn-ghost price-cta" onclick="showPage('demo')">Start Free Trial</a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-popular">Most Popular</div>
+        <div class="price-tier">Standard</div>
+        <div class="price-num">৳2,499 <span class="price-period">/month</span></div>
+        <p class="price-desc">The complete solution for schools, colleges, and growing private libraries.</p>
+        <div class="price-divider"></div>
+        <ul class="price-feat-list">
+          <li>Up to 25,000 books</li>
+          <li>Up to 3,000 members</li>
+          <li>Issue & Return management</li>
+          <li>Automatic fine calculation</li>
+          <li>Advanced PDF/Excel reports</li>
+          <li>Cloud backup (hourly)</li>
+          <li>Phone + Email support (4hr)</li>
+          <li>Barcode scanner support</li>
+          <li>SMS reminders (500/mo)</li>
+          <li>Member ID card printing</li>
+          <li class="no">Multi-branch</li>
+          <li class="no">API access</li>
+        </ul>
+        <a href="#" class="btn btn-primary price-cta" onclick="showPage('demo')">Start Free Trial</a>
+      </div>
+      <div class="price-card">
+        <div class="price-tier">Premium</div>
+        <div class="price-num">৳5,999 <span class="price-period">/month</span></div>
+        <p class="price-desc">For universities, large public libraries, and institutions with multiple branches.</p>
+        <div class="price-divider"></div>
+        <ul class="price-feat-list">
+          <li>Unlimited books</li>
+          <li>Unlimited members</li>
+          <li>Issue & Return management</li>
+          <li>Automatic fine calculation</li>
+          <li>Full analytics dashboard</li>
+          <li>Cloud backup (real-time)</li>
+          <li>Priority support (1hr response)</li>
+          <li>Barcode scanner support</li>
+          <li>Unlimited SMS + Email reminders</li>
+          <li>Member ID card printing</li>
+          <li>Multi-branch management</li>
+          <li>API access</li>
+        </ul>
+        <a href="#" class="btn btn-ghost price-cta" onclick="showPage('demo')">Start Free Trial</a>
+      </div>
+    </div>
+
+    <div style="margin-top:60px">
+      <h2 style="font-size:26px;font-weight:700;margin-bottom:8px;text-align:center">Full Feature Comparison</h2>
+      <p style="text-align:center;color:var(--text-muted);margin-bottom:0">See exactly what's included in each plan</p>
+      <div style="overflow-x:auto">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="width:36%">Feature</th>
+            <th>Basic<br><span style="font-weight:400;opacity:.7">৳999/mo</span></th>
+            <th class="highlight-col" style="color:var(--accent)">Standard ★<br><span style="font-weight:400;opacity:.7">৳2,499/mo</span></th>
+            <th>Premium<br><span style="font-weight:400;opacity:.7">৳5,999/mo</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="4" style="background:var(--gray-100);font-weight:600;font-size:13px;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em">Book Management</td></tr>
+          <tr><td>Book catalog</td><td>5,000</td><td class="highlight-col">25,000</td><td>Unlimited</td></tr>
+          <tr><td>Barcode scanning</td><td class="cross">✕</td><td class="highlight-col check">✓</td><td class="check">✓</td></tr>
+          <tr><td>Bulk import from Excel</td><td class="check">✓</td><td class="highlight-col check">✓</td><td class="check">✓</td></tr>
+          <tr><td colspan="4" style="background:var(--gray-100);font-weight:600;font-size:13px;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em">Members & Circulation</td></tr>
+          <tr><td>Member profiles</td><td>500</td><td class="highlight-col">3,000</td><td>Unlimited</td></tr>
+          <tr><td>Issue & Return</td><td class="check">✓</td><td class="highlight-col check">✓</td><td class="check">✓</td></tr>
+          <tr><td>Fine calculation</td><td class="check">✓</td><td class="highlight-col check">✓</td><td class="check">✓</td></tr>
+          <tr><td>SMS reminders</td><td class="cross">✕</td><td class="highlight-col">500/mo</td><td>Unlimited</td></tr>
+          <tr><td>ID card printing</td><td class="cross">✕</td><td class="highlight-col check">✓</td><td class="check">✓</td></tr>
+          <tr><td colspan="4" style="background:var(--gray-100);font-weight:600;font-size:13px;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em">Reports & Data</td></tr>
+          <tr><td>Monthly reports</td><td class="check">✓ (basic)</td><td class="highlight-col check">✓ (advanced)</td><td class="check">✓ (full)</td></tr>
+          <tr><td>Excel export</td><td class="cross">✕</td><td class="highlight-col check">✓</td><td class="check">✓</td></tr>
+          <tr><td>Analytics dashboard</td><td class="cross">✕</td><td class="cross highlight-col">✕</td><td class="check">✓</td></tr>
+          <tr><td>Cloud backup</td><td>Daily</td><td class="highlight-col">Hourly</td><td>Real-time</td></tr>
+          <tr><td colspan="4" style="background:var(--gray-100);font-weight:600;font-size:13px;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em">Support & Access</td></tr>
+          <tr><td>Support channel</td><td>Email (48hr)</td><td class="highlight-col">Phone + Email (4hr)</td><td>Priority (1hr)</td></tr>
+          <tr><td>Multi-branch</td><td class="cross">✕</td><td class="cross highlight-col">✕</td><td class="check">✓</td></tr>
+          <tr><td>API access</td><td class="cross">✕</td><td class="cross highlight-col">✕</td><td class="check">✓</td></tr>
+          <tr><td>Free setup support</td><td class="check">✓</td><td class="highlight-col check">✓</td><td class="check">✓</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div style="background:var(--navy);border-radius:var(--radius-lg);padding:40px;margin-top:50px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center">
+      <div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px">Special Pricing</div>
+        <h3 style="color:#fff;font-size:24px;font-weight:700;margin-bottom:12px">NGO, Government & Annual Plans</h3>
+        <p style="color:rgba(255,255,255,0.6);font-size:15px;line-height:1.7">Public libraries, NGO-funded institutions, and government schools qualify for discounted pricing. Annual subscriptions save up to 20%.</p>
+      </div>
+      <div style="text-align:center">
+        <p style="color:rgba(255,255,255,0.6);font-size:15px;margin-bottom:20px">Talk to us about your specific situation — we'll build a plan that fits your budget.</p>
+        <a href="#" class="btn btn-primary" onclick="showPage('contact')">Contact Our Team</a>
+      </div>
+    </div>
+  </div>
+</section>
+</div><!-- /page-pricing -->
+
+<!-- ══════════════════════════════ DEMO PAGE ══════════════════════════════ -->
+<div id="page-demo" class="page-section">
+<div class="page-hero" style="padding:130px 0 80px">
+  <div class="container">
+    <div class="tag" style="background:rgba(245,166,35,0.15);color:var(--accent-lt)">Free Trial & Demo</div>
+    <h1>See LibraryOS in Action</h1>
+    <p>Start your free 30-day trial or book a personalized demo — no commitments, no credit card.</p>
+  </div>
+</div>
+<section class="section demo-section">
+  <div class="container">
+    <div class="demo-inner">
+      <div>
+        <h2 class="section-title" style="font-size:32px">Why Librarians Love Our Demo</h2>
+        <p style="color:var(--text-muted);margin-bottom:36px">In 30 minutes, you'll see exactly how LibraryOS transforms your daily workflow — using your own library's example data.</p>
+        <div class="demo-benefit">
+          <div class="demo-benefit-icon">🚀</div>
+          <div>
+            <strong>Live walkthrough with your data</strong>
+            <span>We'll use example book titles and member names from your institution during the demo.</span>
+          </div>
+        </div>
+        <div class="demo-benefit">
+          <div class="demo-benefit-icon">🇧🇩</div>
+          <div>
+            <strong>Demo in Bangla or English</strong>
+            <span>Our support team speaks Bangla. The demo can be conducted entirely in Bangla if preferred.</span>
+          </div>
+        </div>
+        <div class="demo-benefit">
+          <div class="demo-benefit-icon">❓</div>
+          <div>
+            <strong>Ask any question, live</strong>
+            <span>Worried about your barcode scanner? Your Excel data? Power outages? Ask everything on the call.</span>
+          </div>
+        </div>
+        <div class="demo-benefit">
+          <div class="demo-benefit-icon">📦</div>
+          <div>
+            <strong>Free trial starts immediately</strong>
+            <span>After signup, your account is live instantly. No waiting period, no approval needed.</span>
+          </div>
+        </div>
+        <div style="background:var(--off-white);border-radius:var(--radius);padding:22px;border:1px solid var(--gray-200);margin-top:36px">
+          <div style="font-size:13px;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">What You Get in the Free Trial</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;gap:10px;font-size:14px;color:var(--gray-800)"><span style="color:var(--green);font-weight:600">✓</span> Full Standard plan access for 30 days</div>
+            <div style="display:flex;gap:10px;font-size:14px;color:var(--gray-800)"><span style="color:var(--green);font-weight:600">✓</span> Free data import of your existing catalog</div>
+            <div style="display:flex;gap:10px;font-size:14px;color:var(--gray-800)"><span style="color:var(--green);font-weight:600">✓</span> Dedicated setup support session</div>
+            <div style="display:flex;gap:10px;font-size:14px;color:var(--gray-800)"><span style="color:var(--green);font-weight:600">✓</span> No credit card required</div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-form-card">
+        <h3 style="font-size:22px;font-weight:700;margin-bottom:6px">Book Your Free Demo</h3>
+        <p style="font-size:14px;color:var(--text-muted);margin-bottom:28px">Fill in your details and we'll contact you within 2 hours to schedule.</p>
+        <div class="form-group">
+          <label class="form-label">Your Full Name *</label>
+          <input type="text" class="form-input" placeholder="e.g. Rahima Khanam">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address *</label>
+          <input type="email" class="form-input" placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mobile Number *</label>
+          <input type="tel" class="form-input" placeholder="+880 1XXX-XXXXXX">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Institution Name *</label>
+          <input type="text" class="form-input" placeholder="e.g. Motijheel Girls' School">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Institution Type</label>
+          <select class="form-select">
+            <option>School (Primary/Secondary)</option>
+            <option>College</option>
+            <option>University</option>
+            <option>Private/Public Library</option>
+            <option>Madrasa</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Approximate Number of Books</label>
+          <select class="form-select">
+            <option>Under 1,000</option>
+            <option>1,000 – 5,000</option>
+            <option>5,000 – 20,000</option>
+            <option>Over 20,000</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:15px;font-size:16px;margin-top:8px">
+          Book My Free Demo →
+        </button>
+        <p style="text-align:center;font-size:12px;color:var(--text-muted);margin-top:14px">We'll contact you within 2 business hours • No spam, ever</p>
+      </div>
+    </div>
+  </div>
+</section>
+</div><!-- /page-demo -->
+
+<!-- ══════════════════════════════ ABOUT PAGE ══════════════════════════════ -->
+<div id="page-about" class="page-section">
+<div class="page-hero">
+  <div class="container">
+    <div class="tag" style="background:rgba(245,166,35,0.15);color:var(--accent-lt)">About Us</div>
+    <h1>Built for Libraries Like Yours</h1>
+    <p>LibraryOS was founded by educators and developers who were tired of watching librarians struggle with paperwork.</p>
+  </div>
+</div>
+<section class="section" style="background:#fff">
+  <div class="container">
+    <div class="grid-2" style="gap:70px">
+      <div>
+        <div class="tag">Our Story</div>
+        <h2 class="section-title">Why We Built LibraryOS</h2>
+        <p style="color:var(--text-muted);margin-bottom:18px">In 2019, our founder visited a school library in Sylhet where the librarian was managing 8,000 books with three handwritten registers and a 10-year-old notebook. A book had been lost for 2 years — no one knew who had it.</p>
+        <p style="color:var(--text-muted);margin-bottom:18px">We looked at existing library software. Most was designed for large Western universities — too complex, too expensive, and entirely in English.</p>
+        <p style="color:var(--text-muted)">So we built LibraryOS from the ground up — for schools and libraries in Bangladesh and similar contexts. Simple enough for any librarian to learn in a day, powerful enough to handle 50,000 books.</p>
+      </div>
+      <div style="background:var(--off-white);border-radius:var(--radius-lg);padding:40px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div style="text-align:center;padding:24px 16px;background:#fff;border-radius:var(--radius);border:1px solid var(--gray-200)">
+            <div style="font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--navy)">2019</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-top:4px">Founded in Dhaka</div>
+          </div>
+          <div style="text-align:center;padding:24px 16px;background:#fff;border-radius:var(--radius);border:1px solid var(--gray-200)">
+            <div style="font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--blue)">500+</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-top:4px">Active institutions</div>
+          </div>
+          <div style="text-align:center;padding:24px 16px;background:#fff;border-radius:var(--radius);border:1px solid var(--gray-200)">
+            <div style="font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--green)">97%</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-top:4px">Customer satisfaction</div>
+          </div>
+          <div style="text-align:center;padding:24px 16px;background:#fff;border-radius:var(--radius);border:1px solid var(--gray-200)">
+            <div style="font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--accent)">8</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-top:4px">Countries served</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:80px">
+      <h2 class="section-title text-center">Our Values</h2>
+      <p class="section-sub text-center" style="margin:0 auto 50px">Three principles that guide every decision we make.</p>
+      <div class="about-values">
+        <div class="value-card">
+          <div class="value-icon">🎯</div>
+          <h3>Simplicity First</h3>
+          <p>We remove features that create confusion. Every workflow should feel obvious — if a librarian needs a manual, we failed.</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">🤝</div>
+          <h3>Local Context</h3>
+          <p>Software designed in Silicon Valley doesn't understand monsoon season, power cuts, or Bangla names. We do.</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">📈</div>
+          <h3>Accessible Pricing</h3>
+          <p>A school library in rural Bangladesh should have access to the same quality tools as a university in Dhaka. Always.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:80px">
+      <h2 class="section-title text-center">Meet the Team</h2>
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="team-avatar" style="background:#1B6CA8">AR</div>
+          <h4>Arif Rahman</h4>
+          <span>Co-founder & CEO</span>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar" style="background:#17B978">NI</div>
+          <h4>Nusrat Islam</h4>
+          <span>Co-founder & Head of Product</span>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar" style="background:#F5A623;color:#0B1F3A">SK</div>
+          <h4>Siam Khan</h4>
+          <span>Lead Engineer</span>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar" style="background:#0B1F3A">FH</div>
+          <h4>Fatima Hoque</h4>
+          <span>Head of Customer Success</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div><!-- /page-about -->
+
+<!-- ══════════════════════════════ CONTACT PAGE ══════════════════════════════ -->
+<div id="page-contact" class="page-section">
+<div class="page-hero">
+  <div class="container">
+    <div class="tag" style="background:rgba(245,166,35,0.15);color:var(--accent-lt)">Contact</div>
+    <h1>We're Here to Help</h1>
+    <p>Questions? Problems? Just want to chat before deciding? We respond within 2 hours.</p>
+  </div>
+</div>
+<section class="section" style="background:#fff">
+  <div class="container">
+    <div class="contact-inner">
+      <div>
+        <h2 style="font-size:28px;font-weight:700;margin-bottom:10px">Get in Touch</h2>
+        <p style="color:var(--text-muted);margin-bottom:36px">Our team speaks Bangla and English. Don't hesitate to write in Bangla if that's easier for you.</p>
+        <div class="contact-info-item">
+          <div class="contact-icon">📞</div>
+          <div>
+            <h4>Phone (Bangla/English)</h4>
+            <p>+880 1700-000000<br>Mon–Fri, 9am–6pm BST</p>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-icon">📧</div>
+          <div>
+            <h4>Email Support</h4>
+            <p>hello@libraryos.com.bd<br>Response within 2 business hours</p>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-icon">💬</div>
+          <div>
+            <h4>WhatsApp</h4>
+            <p>+880 1700-000001<br>Quick answers via WhatsApp</p>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-icon">📍</div>
+          <div>
+            <h4>Office</h4>
+            <p>Level 4, House 12, Road 2<br>Dhanmondi, Dhaka 1205</p>
+          </div>
+        </div>
+      </div>
+      <div class="demo-form-card">
+        <h3 style="font-size:22px;font-weight:700;margin-bottom:6px">Send a Message</h3>
+        <p style="font-size:14px;color:var(--text-muted);margin-bottom:24px">We'll get back to you within 2 hours during business days.</p>
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input type="text" class="form-input" placeholder="Full name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email or Phone</label>
+          <input type="text" class="form-input" placeholder="How should we reach you?">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <select class="form-select">
+            <option>I want to book a demo</option>
+            <option>I have a question about pricing</option>
+            <option>I need technical support</option>
+            <option>I want to cancel or change my plan</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Message</label>
+          <textarea class="form-input" placeholder="Tell us how we can help — don't hesitate to write in Bangla!"></textarea>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:15px;font-size:16px">Send Message →</button>
+      </div>
+    </div>
+  </div>
+</section>
+</div><!-- /page-contact -->
+
+<!-- ══════════════════════════════ BLOG PAGE ══════════════════════════════ -->
+<div id="page-blog" class="page-section">
+<div class="page-hero">
+  <div class="container">
+    <div class="tag" style="background:rgba(245,166,35,0.15);color:var(--accent-lt)">Blog</div>
+    <h1>Library Management Insights</h1>
+    <p>Practical guides, tips, and stories for modern librarians across South Asia.</p>
+  </div>
+</div>
+<section class="section" style="background:#fff">
+  <div class="container">
+    <div class="blog-grid">
+      <div class="blog-card">
+        <div class="blog-thumb" style="background:#EEF2F7">📋</div>
+        <div class="blog-body">
+          <div class="blog-cat">Getting Started</div>
+          <h3>How to Migrate Your Paper Records to a Digital Library System</h3>
+          <p>A step-by-step guide for librarians making the switch — covering data entry, member migration, and avoiding common mistakes.</p>
+          <div class="blog-meta"><span>📅 June 10, 2025</span><span>⏱ 8 min read</span></div>
+        </div>
+      </div>
+      <div class="blog-card">
+        <div class="blog-thumb" style="background:#EEF2F7">📊</div>
+        <div class="blog-body">
+          <div class="blog-cat">Best Practices</div>
+          <h3>5 Reports Every School Librarian Should Show Their Principal</h3>
+          <p>Use data to secure your library budget. Here are the five reports that impress school administrators and justify investment.</p>
+          <div class="blog-meta"><span>📅 May 28, 2025</span><span>⏱ 6 min read</span></div>
+        </div>
+      </div>
+      <div class="blog-card">
+        <div class="blog-thumb" style="background:#EEF2F7">🔍</div>
+        <div class="blog-body">
+          <div class="blog-cat">Technology</div>
+          <h3>Barcode Scanners for Libraries: A Buyer's Guide for Bangladesh</h3>
+          <p>Which barcode scanner works best? We tested 6 models available in Dhaka markets between ৳1,500 and ৳8,000.</p>
+          <div class="blog-meta"><span>📅 May 15, 2025</span><span>⏱ 10 min read</span></div>
+        </div>
+      </div>
+      <div class="blog-card">
+        <div class="blog-thumb" style="background:#EEF2F7">💰</div>
+        <div class="blog-body">
+          <div class="blog-cat">Management</div>
+          <h3>How to Reduce Book Loss in Your Library by 80%</h3>
+          <p>Practical steps — from improved tracking to smart overdue reminders — that dramatically cut down on missing books.</p>
+          <div class="blog-meta"><span>📅 May 1, 2025</span><span>⏱ 7 min read</span></div>
+        </div>
+      </div>
+      <div class="blog-card">
+        <div class="blog-thumb" style="background:#EEF2F7">🎓</div>
+        <div class="blog-body">
+          <div class="blog-cat">Case Study</div>
+          <h3>How Comilla Victoria College Managed 18,000 Books with 2 Staff</h3>
+          <p>A behind-the-scenes look at how one of Bangladesh's largest college libraries transformed its operations.</p>
+          <div class="blog-meta"><span>📅 April 18, 2025</span><span>⏱ 5 min read</span></div>
+        </div>
+      </div>
+      <div class="blog-card">
+        <div class="blog-thumb" style="background:#EEF2F7">📱</div>
+        <div class="blog-body">
+          <div class="blog-cat">Technology</div>
+          <h3>Why Your Library System Must Work Offline in Bangladesh</h3>
+          <p>Internet connectivity in schools outside Dhaka is unreliable. Here's why offline-first library software isn't optional.</p>
+          <div class="blog-meta"><span>📅 April 5, 2025</span><span>⏱ 6 min read</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:50px">
+      <p style="color:var(--text-muted);margin-bottom:16px">New articles every week — written for librarians, not developers.</p>
+      <div style="display:flex;gap:12px;justify-content:center;max-width:400px;margin:0 auto">
+        <input type="email" class="form-input" placeholder="Your email for updates" style="flex:1">
+        <button class="btn btn-blue">Subscribe</button>
+      </div>
+    </div>
+  </div>
+</section>
+</div><!-- /page-blog -->
+
+<!-- ══════════════════════════════ FOOTER ══════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo" style="font-size:20px">
+          <div class="logo-icon"><svg viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" fill="none" stroke="#0B1F3A" stroke-width="2.2" stroke-linecap="round"/><path d="M8 7h8M8 11h6" stroke="#0B1F3A" stroke-width="2" stroke-linecap="round" fill="none"/></svg></div>
+          LibraryOS
+        </div>
+        <p>Modern library management software built for schools, colleges, and libraries across South Asia.</p>
+        <div style="display:flex;gap:12px;margin-top:18px">
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">f</div>
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer">in</div>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a href="#" onclick="showPage('features')">Features</a>
+        <a href="#" onclick="showPage('pricing')">Pricing</a>
+        <a href="#" onclick="showPage('demo')">Free Trial</a>
+        <a href="#" onclick="showPage('demo')">Book Demo</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#" onclick="showPage('about')">About Us</a>
+        <a href="#" onclick="showPage('blog')">Blog</a>
+        <a href="#" onclick="showPage('contact')">Contact</a>
+        <a href="#">Careers</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="#">Help Center</a>
+        <a href="#">Setup Guide</a>
+        <a href="#">Video Tutorials</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 LibraryOS. Made with ❤️ in Dhaka, Bangladesh.</span>
+      <div>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</div><!-- /page-root -->
+
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+  var target = document.getElementById('page-' + id);
+  if (target) {
+    target.classList.add('active');
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+}
+</script>
+</body>
+</html>
