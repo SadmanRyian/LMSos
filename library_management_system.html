@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #161a22;
+    --surface2: #1e2330;
+    --surface3: #252d3d;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #f0f2f7;
+    --muted: #8a93a8;
+    --accent: #4f7bff;
+    --accent2: #7c9fff;
+    --gold: #e8b85a;
+    --gold2: #f5d07a;
+    --green: #3ecf8e;
+    --red: #f87171;
+    --purple: #a78bfa;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+  }
+
+  body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 14px; line-height: 1.6; min-height: 100vh; }
+
+  .app { min-height: 100vh; }
+
+  /* MARKETING SITE */
+  .marketing { min-height: 100vh; }
+
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 3rem; border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px); background: rgba(13,15,20,0.85);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo { font-family: var(--font-display); font-size: 1.4rem; color: var(--gold); letter-spacing: -0.02em; }
+  .nav-links { display: flex; gap: 2rem; align-items: center; }
+  .nav-links a { color: var(--muted); font-size: 0.875rem; cursor: pointer; text-decoration: none; transition: color 0.2s; font-weight: 500; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-btn { background: var(--accent); color: white; border: none; padding: 0.5rem 1.25rem; border-radius: 8px; font-family: var(--font-sans); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .nav-btn:hover { background: var(--accent2); transform: translateY(-1px); }
+
+  .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; padding: 5rem 3rem 4rem; align-items: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(79,123,255,0.08) 0%, transparent 70%); pointer-events: none; }
+
+  .hero-eyebrow { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(232,184,90,0.1); border: 1px solid rgba(232,184,90,0.2); color: var(--gold); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.35rem 0.75rem; border-radius: 100px; margin-bottom: 1.25rem; }
+  .hero-title { font-family: var(--font-display); font-size: 3.2rem; line-height: 1.1; letter-spacing: -0.02em; color: var(--text); margin-bottom: 1.25rem; }
+  .hero-title span { color: var(--gold); }
+  .hero-desc { color: var(--muted); font-size: 1rem; line-height: 1.7; margin-bottom: 2rem; max-width: 440px; }
+  .hero-stats { display: flex; gap: 2rem; margin-bottom: 2rem; }
+  .stat-item { text-align: left; }
+  .stat-num { font-family: var(--font-display); font-size: 1.75rem; color: var(--text); font-weight: 600; }
+  .stat-lbl { font-size: 0.75rem; color: var(--muted); }
+
+  /* LOGIN CARD */
+  .login-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; padding: 2rem; box-shadow: 0 40px 80px rgba(0,0,0,0.4); }
+  .login-card h3 { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 0.25rem; }
+  .login-card p { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
+  .form-group { margin-bottom: 1rem; }
+  .form-label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--muted); margin-bottom: 0.4rem; }
+  .form-input { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 0.65rem 0.85rem; color: var(--text); font-family: var(--font-sans); font-size: 0.9rem; transition: border-color 0.2s; outline: none; }
+  .form-input:focus { border-color: var(--accent); }
+  .form-input::placeholder { color: var(--muted); }
+  .login-btn { width: 100%; background: var(--accent); color: white; border: none; border-radius: 8px; padding: 0.75rem; font-family: var(--font-sans); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-top: 0.5rem; }
+  .login-btn:hover { background: var(--accent2); transform: translateY(-1px); }
+  .login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .login-demo { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+  .demo-title { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem; font-weight: 500; }
+  .demo-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .demo-chip { background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; padding: 0.3rem 0.6rem; font-size: 0.75rem; cursor: pointer; color: var(--muted); transition: all 0.2s; }
+  .demo-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .error-msg { color: var(--red); font-size: 0.8rem; margin-top: 0.25rem; }
+
+  /* FEATURES */
+  .section { padding: 5rem 3rem; }
+  .section-label { text-align: center; display: block; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent2); margin-bottom: 0.75rem; }
+  .section-title { font-family: var(--font-display); font-size: 2.2rem; text-align: center; margin-bottom: 0.75rem; }
+  .section-sub { text-align: center; color: var(--muted); max-width: 500px; margin: 0 auto 3rem; line-height: 1.7; }
+
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  .feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; transition: border-color 0.2s, transform 0.2s; }
+  .feature-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .feature-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; margin-bottom: 1rem; }
+  .feature-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .feature-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+
+  /* PRICING */
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; max-width: 900px; margin: 0 auto; }
+  .pricing-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; position: relative; }
+  .pricing-card.featured { border-color: var(--accent); background: linear-gradient(135deg, rgba(79,123,255,0.05), var(--surface)); }
+  .pricing-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 100px; white-space: nowrap; }
+  .pricing-plan { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+  .pricing-price { font-family: var(--font-display); font-size: 2.25rem; font-weight: 700; margin-bottom: 0.25rem; }
+  .pricing-price span { font-size: 0.9rem; color: var(--muted); font-family: var(--font-sans); font-weight: 400; }
+  .pricing-desc { font-size: 0.82rem; color: var(--muted); margin-bottom: 1.25rem; }
+  .pricing-features { list-style: none; margin-bottom: 1.5rem; }
+  .pricing-features li { font-size: 0.82rem; color: var(--muted); padding: 0.3rem 0; display: flex; align-items: center; gap: 0.5rem; }
+  .pricing-features li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+  .pricing-btn { width: 100%; border: 1px solid var(--border2); border-radius: 8px; padding: 0.65rem; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--text); }
+  .pricing-btn.featured { background: var(--accent); color: white; border-color: var(--accent); }
+  .pricing-btn:hover { background: var(--surface3); }
+  .pricing-btn.featured:hover { background: var(--accent2); }
+
+  /* TESTIMONIALS */
+  .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  .testi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+  .testi-quote { font-size: 0.88rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.25rem; font-style: italic; }
+  .testi-author { display: flex; align-items: center; gap: 0.75rem; }
+  .testi-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; flex-shrink: 0; }
+  .testi-name { font-size: 0.85rem; font-weight: 600; }
+  .testi-role { font-size: 0.75rem; color: var(--muted); }
+
+  /* FOOTER */
+  .footer { padding: 2rem 3rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .footer-logo { font-family: var(--font-display); color: var(--gold); font-size: 1.1rem; }
+  .footer-text { color: var(--muted); font-size: 0.8rem; }
+
+  /* DASHBOARD */
+  .dashboard { display: flex; min-height: 100vh; }
+  .sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); padding: 1.5rem 0; display: flex; flex-direction: column; flex-shrink: 0; }
+  .sidebar-logo { font-family: var(--font-display); font-size: 1.2rem; color: var(--gold); padding: 0 1.25rem 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 0.75rem; }
+  .sidebar-section { padding: 0 0.75rem; margin-bottom: 0.25rem; }
+  .sidebar-label { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 0.5rem 0.5rem 0.25rem; }
+  .sidebar-item { display: flex; align-items: center; gap: 0.65rem; padding: 0.55rem 0.75rem; border-radius: 8px; cursor: pointer; color: var(--muted); font-size: 0.85rem; font-weight: 500; transition: all 0.15s; margin-bottom: 2px; }
+  .sidebar-item:hover { background: var(--surface2); color: var(--text); }
+  .sidebar-item.active { background: rgba(79,123,255,0.12); color: var(--accent2); }
+  .sidebar-item .icon { font-size: 0.9rem; width: 18px; text-align: center; }
+  .sidebar-footer { margin-top: auto; padding: 1rem 0.75rem 0; border-top: 1px solid var(--border); }
+  .user-pill { display: flex; align-items: center; gap: 0.65rem; padding: 0.5rem 0.75rem; border-radius: 8px; cursor: pointer; }
+  .user-pill:hover { background: var(--surface2); }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; flex-shrink: 0; }
+  .user-info .name { font-size: 0.8rem; font-weight: 600; color: var(--text); }
+  .user-info .role { font-size: 0.7rem; color: var(--muted); }
+  .logout-btn { width: 100%; margin-top: 0.5rem; background: none; border: 1px solid var(--border); border-radius: 8px; padding: 0.45rem; color: var(--muted); font-size: 0.8rem; cursor: pointer; font-family: var(--font-sans); transition: all 0.2s; }
+  .logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+  .main-content { flex: 1; overflow-y: auto; background: var(--bg); padding: 2rem; }
+  .page-header { margin-bottom: 1.75rem; }
+  .page-title { font-family: var(--font-display); font-size: 1.75rem; margin-bottom: 0.25rem; }
+  .page-sub { color: var(--muted); font-size: 0.875rem; }
+
+  /* STAT CARDS */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.75rem; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+  .stat-card-label { font-size: 0.75rem; font-weight: 500; color: var(--muted); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between; }
+  .stat-card-value { font-family: var(--font-display); font-size: 2rem; font-weight: 600; line-height: 1; margin-bottom: 0.35rem; }
+  .stat-card-change { font-size: 0.75rem; color: var(--green); }
+  .stat-card-change.neg { color: var(--red); }
+
+  /* TABLE */
+  .table-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .table-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); }
+  .table-title { font-size: 0.9rem; font-weight: 600; }
+  .search-bar { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 0.45rem 0.75rem; color: var(--text); font-family: var(--font-sans); font-size: 0.8rem; width: 200px; outline: none; }
+  .search-bar:focus { border-color: var(--accent); }
+  .search-bar::placeholder { color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 0.65rem 1.25rem; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); }
+  td { padding: 0.75rem 1.25rem; font-size: 0.85rem; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+
+  .badge { display: inline-flex; align-items: center; padding: 0.2rem 0.6rem; border-radius: 100px; font-size: 0.7rem; font-weight: 600; }
+  .badge-green { background: rgba(62,207,142,0.1); color: var(--green); }
+  .badge-blue { background: rgba(79,123,255,0.1); color: var(--accent2); }
+  .badge-red { background: rgba(248,113,113,0.1); color: var(--red); }
+  .badge-gold { background: rgba(232,184,90,0.1); color: var(--gold); }
+  .badge-purple { background: rgba(167,139,250,0.1); color: var(--purple); }
+
+  .action-btn { background: none; border: 1px solid var(--border2); border-radius: 6px; padding: 0.25rem 0.6rem; color: var(--muted); font-size: 0.75rem; cursor: pointer; font-family: var(--font-sans); transition: all 0.15s; margin-right: 4px; }
+  .action-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .action-btn.danger:hover { border-color: var(--red); color: var(--red); }
+
+  /* USER DASHBOARD */
+  .user-dash-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+  .profile-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; text-align: center; }
+  .profile-avatar { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; margin: 0 auto 1rem; }
+  .profile-name { font-family: var(--font-display); font-size: 1.25rem; margin-bottom: 0.25rem; }
+  .profile-email { font-size: 0.8rem; color: var(--muted); margin-bottom: 1rem; }
+  .profile-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1.25rem; border-top: 1px solid var(--border); padding-top: 1.25rem; }
+  .ps-item { text-align: center; }
+  .ps-num { font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; }
+  .ps-lbl { font-size: 0.7rem; color: var(--muted); }
+
+  .sub-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; }
+  .sub-card h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem; }
+  .sub-plan { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+  .sub-plan-name { font-family: var(--font-display); font-size: 1.4rem; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted); margin-bottom: 0.4rem; }
+  .progress-bar { height: 6px; background: var(--surface3); border-radius: 100px; overflow: hidden; margin-bottom: 1rem; }
+  .progress-fill { height: 100%; border-radius: 100px; transition: width 0.5s ease; }
+
+  .books-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+  .book-mini { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem; }
+  .book-mini h5 { font-size: 0.82rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .book-mini .author { font-size: 0.73rem; color: var(--muted); margin-bottom: 0.5rem; }
+  .book-mini .due { font-size: 0.7rem; }
+
+  /* BOOKS MANAGEMENT */
+  .add-btn { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 0.5rem 1rem; font-family: var(--font-sans); font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .add-btn:hover { background: var(--accent2); }
+
+  /* GRID CHARTS */
+  .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem; }
+  .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+  .chart-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; }
+  .bar-chart { display: flex; align-items: flex-end; gap: 0.5rem; height: 120px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+  .bar { width: 100%; border-radius: 4px 4px 0 0; transition: opacity 0.2s; cursor: pointer; }
+  .bar:hover { opacity: 0.8; }
+  .bar-lbl { font-size: 0.65rem; color: var(--muted); }
+
+  .donut-wrap { display: flex; flex-direction: column; gap: 0.5rem; }
+  .donut-item { display: flex; align-items: center; gap: 0.65rem; }
+  .donut-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .donut-label { flex: 1; font-size: 0.8rem; color: var(--muted); }
+  .donut-val { font-size: 0.8rem; font-weight: 600; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 200; backdrop-filter: blur(4px); }
+  .modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; padding: 2rem; width: 420px; max-width: 90vw; }
+  .modal-title { font-family: var(--font-display); font-size: 1.25rem; margin-bottom: 0.25rem; }
+  .modal-sub { color: var(--muted); font-size: 0.82rem; margin-bottom: 1.5rem; }
+  .modal-footer { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+  .modal-btn { flex: 1; border-radius: 8px; padding: 0.65rem; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; border: 1px solid var(--border2); background: transparent; color: var(--text); }
+  .modal-btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .modal-btn:hover { background: var(--surface2); }
+  .modal-btn.primary:hover { background: var(--accent2); }
+
+  .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 0.75rem 1.25rem; font-size: 0.85rem; z-index: 300; box-shadow: 0 8px 24px rgba(0,0,0,0.3); animation: slideIn 0.3s ease; }
+  @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  select { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 0.5rem 0.75rem; color: var(--text); font-family: var(--font-sans); font-size: 0.85rem; outline: none; cursor: pointer; }
+  select:focus { border-color: var(--accent); }
+
+  .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 0.875rem; }
+
+  .section-bg-alt { background: var(--surface); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+const { useState, useEffect, useCallback } = React;
+const { createRoot } = ReactDOM;
+
+const USERS_DB = [
+  { id: 1, name: 'Sarah Chen', email: 'sarah@university.edu', role: 'User', subscription: 'Premium', subDays: 67, booksRead: 23, booksIssued: 3, joined: '2024-09-01', status: 'Active',
+    issuedBooks: [
+      { id: 1, title: 'Clean Code', author: 'Robert C. Martin', issued: '2025-04-20', due: '2025-05-20' },
+      { id: 2, title: 'The Pragmatic Programmer', author: 'Hunt & Thomas', issued: '2025-04-28', due: '2025-05-28' },
+      { id: 3, title: 'Design Patterns', author: 'Gang of Four', issued: '2025-05-01', due: '2025-06-01' },
+    ]},
+  { id: 2, name: 'Marcus Osei', email: 'marcus@student.edu', role: 'User', subscription: 'Standard', subDays: 12, booksRead: 8, booksIssued: 1, joined: '2025-01-15', status: 'Active',
+    issuedBooks: [
+      { id: 4, title: 'Introduction to Algorithms', author: 'Cormen et al.', issued: '2025-04-25', due: '2025-05-25' },
+    ]},
+  { id: 3, name: 'Priya Sharma', email: 'priya@faculty.edu', role: 'User', subscription: 'Premium', subDays: 145, booksRead: 51, booksIssued: 2, joined: '2023-08-10', status: 'Active',
+    issuedBooks: [
+      { id: 5, title: 'The Structure of Scientific Revolutions', author: 'Thomas S. Kuhn', issued: '2025-04-15', due: '2025-05-15' },
+      { id: 6, title: 'Thinking, Fast and Slow', author: 'Daniel Kahneman', issued: '2025-04-18', due: '2025-05-18' },
+    ]},
+  { id: 4, name: 'Jordan Blake', email: 'jordan@student.edu', role: 'User', subscription: 'Free', subDays: 0, booksRead: 2, booksIssued: 0, joined: '2025-03-01', status: 'Inactive', issuedBooks: [] },
+  { id: 5, name: 'Admin User', email: 'admin@library.edu', role: 'Admin', subscription: 'Enterprise', subDays: 365, booksRead: 0, booksIssued: 0, joined: '2023-01-01', status: 'Active', issuedBooks: [] },
+];
+
+const BOOKS_DB = [
+  { id: 1, title: 'Clean Code', author: 'Robert C. Martin', genre: 'Technology', available: 2, total: 3 },
+  { id: 2, title: 'The Pragmatic Programmer', author: 'Hunt & Thomas', genre: 'Technology', available: 1, total: 2 },
+  { id: 3, title: 'Design Patterns', author: 'Gang of Four', genre: 'Technology', available: 0, total: 2 },
+  { id: 4, title: 'Introduction to Algorithms', author: 'Cormen et al.', genre: 'Mathematics', available: 3, total: 4 },
+  { id: 5, title: 'The Structure of Scientific Revolutions', author: 'Thomas S. Kuhn', genre: 'Philosophy', available: 1, total: 2 },
+  { id: 6, title: 'Thinking, Fast and Slow', author: 'Daniel Kahneman', genre: 'Psychology', available: 2, total: 3 },
+  { id: 7, title: 'Sapiens', author: 'Yuval Noah Harari', genre: 'History', available: 4, total: 5 },
+  { id: 8, title: '1984', author: 'George Orwell', genre: 'Fiction', available: 2, total: 3 },
+];
+
+const MONTHLY_DATA = [
+  { m: 'Oct', issues: 42 }, { m: 'Nov', issues: 58 }, { m: 'Dec', issues: 35 },
+  { m: 'Jan', issues: 71 }, { m: 'Feb', issues: 65 }, { m: 'Mar', issues: 89 },
+  { m: 'Apr', issues: 104 }, { m: 'May', issues: 76 },
+];
+
+const MAX_BAR = Math.max(...MONTHLY_DATA.map(d => d.issues));
+
+// ============= MARKETING SITE =============
+function MarketingPage({ onLogin }) {
+  const [email, setEmail] = useState('');
+  const [pass, setPass] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = () => {
+    setError('');
+    setLoading(true);
+    setTimeout(() => {
+      const user = USERS_DB.find(u => u.email === email);
+      if (!user) { setError('No account found with this email.'); setLoading(false); return; }
+      if (pass !== 'password123') { setError('Incorrect password. Try: password123'); setLoading(false); return; }
+      setLoading(false);
+      onLogin(user);
+    }, 800);
+  };
+
+  const fillDemo = (userEmail) => { setEmail(userEmail); setPass('password123'); setError(''); };
+
+  const features = [
+    { icon: '📚', color: 'rgba(79,123,255,0.15)', title: 'Smart Book Management', desc: 'Catalogue thousands of books with rich metadata, availability tracking, and intelligent search across your entire collection.' },
+    { icon: '👥', color: 'rgba(62,207,142,0.15)', title: 'User & Role Management', desc: 'Onboard students and faculty with role-based access control. Track borrowing history and reading patterns per user.' },
+    { icon: '🔄', color: 'rgba(232,184,90,0.15)', title: 'Issue & Return System', desc: 'Seamless book issue and return workflow with automated due date reminders and overdue notifications.' },
+    { icon: '📊', color: 'rgba(167,139,250,0.15)', title: 'Reading Analytics', desc: 'Deep insights into reading habits, popular genres, checkout trends, and engagement metrics across your library.' },
+    { icon: '💳', color: 'rgba(248,113,113,0.15)', title: 'Subscription Tracking', desc: 'Manage membership plans with automated expiry tracking, renewal reminders, and tiered access control.' },
+    { icon: '🔒', color: 'rgba(62,207,142,0.15)', title: 'Secure Authentication', desc: 'JWT-based authentication with role-gated dashboards. Admin and user roles with appropriate access scopes.' },
+  ];
+
+  const testimonials = [
+    { quote: 'LibraryOS transformed how we manage 40,000 books across our campus. The analytics alone saved us hundreds of hours.', name: 'Dr. Faisal Rahman', role: 'Head Librarian, BUET', initials: 'FR', color: '#4f7bff' },
+    { quote: 'My students love tracking their reading progress. The subscription system is intuitive and the interface is genuinely beautiful.', name: 'Prof. Amara Diallo', role: 'Faculty, DU', initials: 'AD', color: '#3ecf8e' },
+    { quote: 'We went from spreadsheets to a real system in a week. The book management and overdue tracking is exactly what we needed.', name: 'Rashida Khan', role: 'Admin, NSU Library', initials: 'RK', color: '#e8b85a' },
+  ];
+
+  return React.createElement('div', { className: 'marketing' },
+    // NAV
+    React.createElement('nav', { className: 'nav' },
+      React.createElement('div', { className: 'nav-logo' }, 'LibraryOS'),
+      React.createElement('div', { className: 'nav-links' },
+        React.createElement('a', null, 'Features'),
+        React.createElement('a', null, 'Pricing'),
+        React.createElement('a', null, 'About'),
+        React.createElement('a', null, 'Contact'),
+        React.createElement('button', { className: 'nav-btn', onClick: () => fillDemo('sarah@university.edu') }, 'Try Demo')
+      )
+    ),
+
+    // HERO
+    React.createElement('section', { className: 'hero' },
+      // LEFT
+      React.createElement('div', null,
+        React.createElement('div', { className: 'hero-eyebrow' }, '✦ Library Management Platform'),
+        React.createElement('h1', { className: 'hero-title' },
+          'Your Library, ', React.createElement('span', null, 'Beautifully'), ' Managed'
+        ),
+        React.createElement('p', { className: 'hero-desc' },
+          'LibraryOS gives institutions a complete platform to manage books, users, and subscriptions — with real-time analytics and a dashboard your team will actually enjoy using.'
+        ),
+        React.createElement('div', { className: 'hero-stats' },
+          React.createElement('div', { className: 'stat-item' },
+            React.createElement('div', { className: 'stat-num' }, '12k+'),
+            React.createElement('div', { className: 'stat-lbl' }, 'Books managed')
+          ),
+          React.createElement('div', { className: 'stat-item' },
+            React.createElement('div', { className: 'stat-num' }, '98%'),
+            React.createElement('div', { className: 'stat-lbl' }, 'Uptime SLA')
+          ),
+          React.createElement('div', { className: 'stat-item' },
+            React.createElement('div', { className: 'stat-num' }, '340+'),
+            React.createElement('div', { className: 'stat-lbl' }, 'Institutions')
+          )
+        )
+      ),
+      // LOGIN CARD
+      React.createElement('div', { className: 'login-card' },
+        React.createElement('h3', null, 'Welcome back'),
+        React.createElement('p', null, 'Sign in to access your library dashboard'),
+        React.createElement('div', { className: 'form-group' },
+          React.createElement('label', { className: 'form-label' }, 'Email address'),
+          React.createElement('input', { className: 'form-input', type: 'email', placeholder: 'you@institution.edu', value: email, onChange: e => setEmail(e.target.value) })
+        ),
+        React.createElement('div', { className: 'form-group' },
+          React.createElement('label', { className: 'form-label' }, 'Password'),
+          React.createElement('input', { className: 'form-input', type: 'password', placeholder: '••••••••', value: pass, onChange: e => setPass(e.target.value),
+            onKeyDown: e => e.key === 'Enter' && handleLogin() })
+        ),
+        error && React.createElement('p', { className: 'error-msg' }, error),
+        React.createElement('button', { className: 'login-btn', onClick: handleLogin, disabled: loading || !email || !pass },
+          loading ? 'Signing in...' : 'Sign In'
+        ),
+        React.createElement('div', { className: 'login-demo' },
+          React.createElement('p', { className: 'demo-title' }, 'Quick demo accounts (password: password123)'),
+          React.createElement('div', { className: 'demo-chips' },
+            React.createElement('div', { className: 'demo-chip', onClick: () => fillDemo('admin@library.edu') }, '🔑 Admin'),
+            React.createElement('div', { className: 'demo-chip', onClick: () => fillDemo('sarah@university.edu') }, '👩‍🎓 Student'),
+            React.createElement('div', { className: 'demo-chip', onClick: () => fillDemo('priya@faculty.edu') }, '👩‍🏫 Faculty'),
+          )
+        )
+      )
+    ),
+
+    // FEATURES
+    React.createElement('section', { className: 'section' },
+      React.createElement('span', { className: 'section-label' }, 'Platform Features'),
+      React.createElement('h2', { className: 'section-title' }, 'Everything a modern library needs'),
+      React.createElement('p', { className: 'section-sub' }, 'From cataloguing to analytics, LibraryOS handles every layer of library operations with clarity and speed.'),
+      React.createElement('div', { className: 'features-grid' },
+        features.map((f, i) =>
+          React.createElement('div', { key: i, className: 'feature-card' },
+            React.createElement('div', { className: 'feature-icon', style: { background: f.color } }, f.icon),
+            React.createElement('h4', null, f.title),
+            React.createElement('p', null, f.desc)
+          )
+        )
+      )
+    ),
+
+    // PRICING
+    React.createElement('section', { className: 'section section-bg-alt' },
+      React.createElement('span', { className: 'section-label' }, 'Pricing'),
+      React.createElement('h2', { className: 'section-title' }, 'Plans for every institution'),
+      React.createElement('p', { className: 'section-sub' }, 'Start free, scale as you grow. No hidden fees, cancel anytime.'),
+      React.createElement('div', { className: 'pricing-grid' },
+        React.createElement('div', { className: 'pricing-card' },
+          React.createElement('p', { className: 'pricing-plan' }, 'Free'),
+          React.createElement('div', { className: 'pricing-price' }, '৳0', React.createElement('span', null, '/month')),
+          React.createElement('p', { className: 'pricing-desc' }, 'For small community libraries'),
+          React.createElement('ul', { className: 'pricing-features' },
+            ['Up to 500 books', 'Up to 50 users', 'Basic analytics', 'Email support'].map((f, i) =>
+              React.createElement('li', { key: i }, f))
+          ),
+          React.createElement('button', { className: 'pricing-btn' }, 'Get started free')
+        ),
+        React.createElement('div', { className: 'pricing-card featured' },
+          React.createElement('div', { className: 'pricing-badge' }, 'Most Popular'),
+          React.createElement('p', { className: 'pricing-plan' }, 'Standard'),
+          React.createElement('div', { className: 'pricing-price' }, '৳2,499', React.createElement('span', null, '/month')),
+          React.createElement('p', { className: 'pricing-desc' }, 'For universities and colleges'),
+          React.createElement('ul', { className: 'pricing-features' },
+            ['Up to 10,000 books', 'Unlimited users', 'Full analytics suite', 'Subscription management', 'Priority support'].map((f, i) =>
+              React.createElement('li', { key: i }, f))
+          ),
+          React.createElement('button', { className: 'pricing-btn featured' }, 'Start 14-day trial')
+        ),
+        React.createElement('div', { className: 'pricing-card' },
+          React.createElement('p', { className: 'pricing-plan' }, 'Enterprise'),
+          React.createElement('div', { className: 'pricing-price' }, 'Custom'),
+          React.createElement('p', { className: 'pricing-desc' }, 'For multi-campus institutions'),
+          React.createElement('ul', { className: 'pricing-features' },
+            ['Unlimited books', 'Unlimited users', 'Custom integrations', 'Dedicated account manager', 'SLA guarantee', 'On-prem option'].map((f, i) =>
+              React.createElement('li', { key: i }, f))
+          ),
+          React.createElement('button', { className: 'pricing-btn' }, 'Contact sales')
+        )
+      )
+    ),
+
+    // TESTIMONIALS
+    React.createElement('section', { className: 'section' },
+      React.createElement('span', { className: 'section-label' }, 'Testimonials'),
+      React.createElement('h2', { className: 'section-title' }, 'Trusted by librarians'),
+      React.createElement('div', { className: 'testimonials-grid' },
+        testimonials.map((t, i) =>
+          React.createElement('div', { key: i, className: 'testi-card' },
+            React.createElement('p', { className: 'testi-quote' }, '"' + t.quote + '"'),
+            React.createElement('div', { className: 'testi-author' },
+              React.createElement('div', { className: 'testi-avatar', style: { background: t.color + '22', color: t.color } }, t.initials),
+              React.createElement('div', null,
+                React.createElement('div', { className: 'testi-name' }, t.name),
+                React.createElement('div', { className: 'testi-role' }, t.role)
+              )
+            )
+          )
+        )
+      )
+    ),
+
+    // FOOTER
+    React.createElement('footer', { className: 'footer' },
+      React.createElement('div', { className: 'footer-logo' }, 'LibraryOS'),
+      React.createElement('div', { className: 'footer-text' }, '© 2025 LibraryOS. Built for institutions that care about knowledge.')
+    )
+  );
+}
+
+// ============= ADMIN DASHBOARD =============
+function AdminDashboard({ user, onLogout }) {
+  const [activePage, setActivePage] = useState('overview');
+  const [users, setUsers] = useState(USERS_DB.filter(u => u.role !== 'Admin'));
+  const [books, setBooks] = useState(BOOKS_DB);
+  const [search, setSearch] = useState('');
+  const [bookSearch, setBookSearch] = useState('');
+  const [filterRole, setFilterRole] = useState('All');
+  const [showModal, setShowModal] = useState(null);
+  const [toast, setToast] = useState('');
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2500); };
+
+  const filteredUsers = users.filter(u => {
+    const matchSearch = u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase());
+    const matchFilter = filterRole === 'All' || u.subscription === filterRole;
+    return matchSearch && matchFilter;
+  });
+
+  const filteredBooks = books.filter(b =>
+    b.title.toLowerCase().includes(bookSearch.toLowerCase()) || b.author.toLowerCase().includes(bookSearch.toLowerCase())
+  );
+
+  const totalIssued = users.reduce((a, u) => a + u.booksIssued, 0);
+  const activeUsers = users.filter(u => u.status === 'Active').length;
+
+  const navItems = [
+    { id: 'overview', label: 'Overview', icon: '◈' },
+    { id: 'users', label: 'Manage Users', icon: '◎' },
+    { id: 'books', label: 'Manage Books', icon: '▣' },
+    { id: 'reports', label: 'Reports', icon: '◉' },
+  ];
+
+  const renderPage = () => {
+    switch (activePage) {
+      case 'overview': return React.createElement(AdminOverview, { users, books, totalIssued, activeUsers });
+      case 'users': return React.createElement(AdminUsers, { users: filteredUsers, search, setSearch, filterRole, setFilterRole, showToast, setSelectedUser, setShowModal });
+      case 'books': return React.createElement(AdminBooks, { books: filteredBooks, bookSearch, setBookSearch, showToast, setShowModal });
+      case 'reports': return React.createElement(AdminReports, { users, books });
+    }
+  };
+
+  return React.createElement('div', { className: 'dashboard' },
+    // SIDEBAR
+    React.createElement('aside', { className: 'sidebar' },
+      React.createElement('div', { className: 'sidebar-logo' }, 'LibraryOS'),
+      React.createElement('div', { className: 'sidebar-section' },
+        React.createElement('div', { className: 'sidebar-label' }, 'Navigation'),
+        navItems.map(item =>
+          React.createElement('div', { key: item.id, className: `sidebar-item ${activePage === item.id ? 'active' : ''}`, onClick: () => setActivePage(item.id) },
+            React.createElement('span', { className: 'icon' }, item.icon),
+            item.label
+          )
+        )
+      ),
+      React.createElement('div', { className: 'sidebar-footer' },
+        React.createElement('div', { className: 'user-pill' },
+          React.createElement('div', { className: 'avatar', style: { background: 'rgba(79,123,255,0.2)', color: '#7c9fff' } }, 'A'),
+          React.createElement('div', { className: 'user-info' },
+            React.createElement('div', { className: 'name' }, 'Admin'),
+            React.createElement('div', { className: 'role' }, 'Administrator')
+          )
+        ),
+        React.createElement('button', { className: 'logout-btn', onClick: onLogout }, '→ Sign Out')
+      )
+    ),
+    // MAIN
+    React.createElement('main', { className: 'main-content' }, renderPage()),
+    // MODAL
+    showModal === 'addBook' && React.createElement('div', { className: 'modal-overlay', onClick: () => setShowModal(null) },
+      React.createElement('div', { className: 'modal', onClick: e => e.stopPropagation() },
+        React.createElement('h3', { className: 'modal-title' }, 'Add New Book'),
+        React.createElement('p', { className: 'modal-sub' }, 'Add a book to the library catalogue'),
+        React.createElement('div', { className: 'form-group' },
+          React.createElement('label', { className: 'form-label' }, 'Book Title'),
+          React.createElement('input', { className: 'form-input', placeholder: 'e.g. The Great Gatsby' })
+        ),
+        React.createElement('div', { className: 'form-group' },
+          React.createElement('label', { className: 'form-label' }, 'Author'),
+          React.createElement('input', { className: 'form-input', placeholder: 'Author name' })
+        ),
+        React.createElement('div', { className: 'form-group' },
+          React.createElement('label', { className: 'form-label' }, 'Genre'),
+          React.createElement('input', { className: 'form-input', placeholder: 'e.g. Fiction' })
+        ),
+        React.createElement('div', { className: 'form-group' },
+          React.createElement('label', { className: 'form-label' }, 'Total Copies'),
+          React.createElement('input', { className: 'form-input', type: 'number', placeholder: '1', min: '1' })
+        ),
+        React.createElement('div', { className: 'modal-footer' },
+          React.createElement('button', { className: 'modal-btn', onClick: () => setShowModal(null) }, 'Cancel'),
+          React.createElement('button', { className: 'modal-btn primary', onClick: () => { setShowModal(null); showToast('Book added to catalogue'); } }, 'Add Book')
+        )
+      )
+    ),
+    toast && React.createElement('div', { className: 'toast' }, '✓ ' + toast)
+  );
+}
+
+function AdminOverview({ users, books, totalIssued, activeUsers }) {
+  return React.createElement('div', null,
+    React.createElement('div', { className: 'page-header' },
+      React.createElement('h1', { className: 'page-title' }, 'Overview'),
+      React.createElement('p', { className: 'page-sub' }, 'Library performance at a glance')
+    ),
+    React.createElement('div', { className: 'stats-grid' },
+      React.createElement('div', { className: 'stat-card' },
+        React.createElement('div', { className: 'stat-card-label' }, 'Total Users', React.createElement('span', null, '👥')),
+        React.createElement('div', { className: 'stat-card-value' }, users.length),
+        React.createElement('div', { className: 'stat-card-change' }, '↑ +3 this month')
+      ),
+      React.createElement('div', { className: 'stat-card' },
+        React.createElement('div', { className: 'stat-card-label' }, 'Active Users', React.createElement('span', null, '◉')),
+        React.createElement('div', { className: 'stat-card-value' }, activeUsers),
+        React.createElement('div', { className: 'stat-card-change' }, '↑ +1 this week')
+      ),
+      React.createElement('div', { className: 'stat-card' },
+        React.createElement('div', { className: 'stat-card-label' }, 'Books Issued', React.createElement('span', null, '📤')),
+        React.createElement('div', { className: 'stat-card-value', style: { color: '#4f7bff' } }, totalIssued),
+        React.createElement('div', { className: 'stat-card-change neg' }, '↓ -2 vs last week')
+      ),
+      React.createElement('div', { className: 'stat-card' },
+        React.createElement('div', { className: 'stat-card-label' }, 'Total Books', React.createElement('span', null, '📚')),
+        React.createElement('div', { className: 'stat-card-value', style: { color: '#e8b85a' } }, books.reduce((a, b) => a + b.total, 0)),
+        React.createElement('div', { className: 'stat-card-change' }, '↑ +12 new titles')
+      )
+    ),
+    React.createElement('div', { className: 'charts-grid' },
+      React.createElement('div', { className: 'chart-card' },
+        React.createElement('div', { className: 'chart-title' }, 'Book Issues — Last 8 Months'),
+        React.createElement('div', { className: 'bar-chart' },
+          MONTHLY_DATA.map((d, i) =>
+            React.createElement('div', { key: i, className: 'bar-col' },
+              React.createElement('div', { className: 'bar', style: { height: Math.round((d.issues / MAX_BAR) * 100) + 'px', background: i === MONTHLY_DATA.length - 1 ? '#4f7bff' : 'rgba(79,123,255,0.3)' }, title: d.issues + ' issues' }),
+              React.createElement('div', { className: 'bar-lbl' }, d.m)
+            )
+          )
+        )
+      ),
+      React.createElement('div', { className: 'chart-card' },
+        React.createElement('div', { className: 'chart-title' }, 'Books by Genre'),
+        React.createElement('div', { className: 'donut-wrap' },
+          [['Technology', 4, '#4f7bff'], ['Psychology', 1, '#3ecf8e'], ['Philosophy', 1, '#e8b85a'], ['Mathematics', 1, '#a78bfa'], ['Fiction', 1, '#f87171'], ['History', 1, '#f5a623']].map(([label, val, color], i) =>
+            React.createElement('div', { key: i, className: 'donut-item' },
+              React.createElement('div', { className: 'donut-dot', style: { background: color } }),
+              React.createElement('span', { className: 'donut-label' }, label),
+              React.createElement('span', { className: 'donut-val' }, val + ' title' + (val > 1 ? 's' : ''))
+            )
+          )
+        )
+      )
+    ),
+    React.createElement('div', { className: 'table-card' },
+      React.createElement('div', { className: 'table-header' },
+        React.createElement('span', { className: 'table-title' }, 'Recent Activity')
+      ),
+      React.createElement('table', null,
+        React.createElement('thead', null,
+          React.createElement('tr', null,
+            ['User', 'Action', 'Book', 'Date'].map(h => React.createElement('th', { key: h }, h))
+          )
+        ),
+        React.createElement('tbody', null,
+          [
+            { user: 'Sarah Chen', action: 'Issued', book: 'Design Patterns', date: 'May 1, 2025' },
+            { user: 'Marcus Osei', action: 'Issued', book: 'Introduction to Algorithms', date: 'Apr 25, 2025' },
+            { user: 'Priya Sharma', action: 'Returned', book: 'Deep Work', date: 'Apr 22, 2025' },
+            { user: 'Sarah Chen', action: 'Issued', book: 'Clean Code', date: 'Apr 20, 2025' },
+            { user: 'Jordan Blake', action: 'Returned', book: 'Atomic Habits', date: 'Apr 18, 2025' },
+          ].map((row, i) =>
+            React.createElement('tr', { key: i },
+              React.createElement('td', null, row.user),
+              React.createElement('td', null, React.createElement('span', { className: `badge ${row.action === 'Issued' ? 'badge-blue' : 'badge-green'}` }, row.action)),
+              React.createElement('td', null, row.book),
+              React.createElement('td', { style: { color: 'var(--muted)' } }, row.date)
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+function AdminUsers({ users, search, setSearch, filterRole, setFilterRole, showToast, setSelectedUser, setShowModal }) {
+  return React.createElement('div', null,
+    React.createElement('div', { className: 'page-header' },
+      React.createElement('h1', { className: 'page-title' }, 'Manage Users'),
+      React.createElement('p', { className: 'page-sub' }, users.length + ' registered users in the system')
+    ),
+    React.createElement('div', { className: 'table-card' },
+      React.createElement('div', { className: 'table-header' },
+        React.createElement('span', { className: 'table-title' }, 'User Directory'),
+        React.createElement('div', { style: { display: 'flex', gap: '0.75rem', alignItems: 'center' } },
+          React.createElement('select', { value: filterRole, onChange: e => setFilterRole(e.target.value) },
+            ['All', 'Premium', 'Standard', 'Free'].map(r => React.createElement('option', { key: r }, r))
+          ),
+          React.createElement('input', { className: 'search-bar', placeholder: 'Search users...', value: search, onChange: e => setSearch(e.target.value) })
+        )
+      ),
+      React.createElement('table', null,
+        React.createElement('thead', null,
+          React.createElement('tr', null,
+            ['Name', 'Email', 'Subscription', 'Books Read', 'Issued', 'Status', 'Actions'].map(h => React.createElement('th', { key: h }, h))
+          )
+        ),
+        React.createElement('tbody', null,
+          users.length === 0
+            ? React.createElement('tr', null, React.createElement('td', { colSpan: 7, style: { textAlign: 'center', color: 'var(--muted)', padding: '2rem' } }, 'No users match your search'))
+            : users.map(u =>
+              React.createElement('tr', { key: u.id },
+                React.createElement('td', null,
+                  React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '0.65rem' } },
+                    React.createElement('div', { className: 'avatar', style: { background: 'rgba(79,123,255,0.15)', color: 'var(--accent2)', fontSize: '0.65rem' } }, u.name.split(' ').map(n => n[0]).join('')),
+                    u.name
+                  )
+                ),
+                React.createElement('td', { style: { color: 'var(--muted)' } }, u.email),
+                React.createElement('td', null, React.createElement('span', { className: u.subscription === 'Premium' ? 'badge badge-gold' : u.subscription === 'Standard' ? 'badge badge-blue' : 'badge badge-purple' }, u.subscription)),
+                React.createElement('td', { style: { fontFamily: 'var(--font-display)' } }, u.booksRead),
+                React.createElement('td', null, u.booksIssued),
+                React.createElement('td', null, React.createElement('span', { className: u.status === 'Active' ? 'badge badge-green' : 'badge badge-red' }, u.status)),
+                React.createElement('td', null,
+                  React.createElement('button', { className: 'action-btn', onClick: () => showToast('Viewing ' + u.name + "'s profile") }, 'View'),
+                  React.createElement('button', { className: 'action-btn danger', onClick: () => showToast('User ' + u.name + ' removed') }, 'Remove')
+                )
+              )
+            )
+        )
+      )
+    )
+  );
+}
+
+function AdminBooks({ books, bookSearch, setBookSearch, showToast, setShowModal }) {
+  return React.createElement('div', null,
+    React.createElement('div', { className: 'page-header', style: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' } },
+      React.createElement('div', null,
+        React.createElement('h1', { className: 'page-title' }, 'Manage Books'),
+        React.createElement('p', { className: 'page-sub' }, books.length + ' titles in catalogue')
+      ),
+      React.createElement('button', { className: 'add-btn', onClick: () => setShowModal('addBook') }, '+ Add Book')
+    ),
+    React.createElement('div', { className: 'table-card' },
+      React.createElement('div', { className: 'table-header' },
+        React.createElement('span', { className: 'table-title' }, 'Book Catalogue'),
+        React.createElement('input', { className: 'search-bar', placeholder: 'Search books...', value: bookSearch, onChange: e => setBookSearch(e.target.value) })
+      ),
+      React.createElement('table', null,
+        React.createElement('thead', null,
+          React.createElement('tr', null,
+            ['Title', 'Author', 'Genre', 'Available', 'Total', 'Actions'].map(h => React.createElement('th', { key: h }, h))
+          )
+        ),
+        React.createElement('tbody', null,
+          books.map(b =>
+            React.createElement('tr', { key: b.id },
+              React.createElement('td', { style: { fontWeight: 500 } }, b.title),
+              React.createElement('td', { style: { color: 'var(--muted)' } }, b.author),
+              React.createElement('td', null, React.createElement('span', { className: 'badge badge-purple' }, b.genre)),
+              React.createElement('td', null,
+                React.createElement('span', { className: b.available === 0 ? 'badge badge-red' : 'badge badge-green' }, b.available + '/' + b.total)
+              ),
+              React.createElement('td', null, b.total),
+              React.createElement('td', null,
+                React.createElement('button', { className: 'action-btn', onClick: () => showToast('Editing ' + b.title) }, 'Edit'),
+                React.createElement('button', { className: 'action-btn danger', onClick: () => showToast(b.title + ' removed') }, 'Remove')
+              )
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+function AdminReports({ users, books }) {
+  const totalRead = users.reduce((a, u) => a + u.booksRead, 0);
+  const totalIssued = users.reduce((a, u) => a + u.booksIssued, 0);
+  return React.createElement('div', null,
+    React.createElement('div', { className: 'page-header' },
+      React.createElement('h1', { className: 'page-title' }, 'Reports'),
+      React.createElement('p', { className: 'page-sub' }, 'System-wide analytics and performance metrics')
+    ),
+    React.createElement('div', { className: 'stats-grid' },
+      React.createElement('div', { className: 'stat-card' },
+        React.createElement('div', { className: 'stat-card-label' }, 'Total Books Read'),
+        React.createElement('div', { className: 'stat-card-value', style: { color: '#3ecf8e' } }, totalRead),
+        React.createElement('div', { className: 'stat-card-change' }, 'Across all users')
+      ),
+      React.createElement('div', { className: 'stat-card' },
+        React.createElement('div', { className: 'stat-card-label' }, 'Currently Issued'),
+        React.createElement('div', { className: 'stat-card-value', style: { color: '#4f7bff' } }, totalIssued),
+        React.createElement('div', { className: 'stat-card-change' }, 'Active checkouts')
+      ),
+      React.createElement('div', { className: 'stat-card' },
+        React.createElement('div', { className: 'stat-card-label' }, 'Premium Users'),
+        React.createElement('div', { className: 'stat-card-value', style: { color: '#e8b85a' } }, users.filter(u => u.subscription === 'Premium').length),
+        React.createElement('div', { className: 'stat-card-change' }, '↑ Growing MoM')
+      ),
+      React.createElement('div', { className: 'stat-card' },
+        React.createElement('div', { className: 'stat-card-label' }, 'Avg. Books/User'),
+        React.createElement('div', { className: 'stat-card-value' }, users.length ? Math.round(totalRead / users.length) : 0),
+        React.createElement('div', { className: 'stat-card-change' }, 'Reading index')
+      )
+    ),
+    React.createElement('div', { className: 'charts-grid' },
+      React.createElement('div', { className: 'chart-card' },
+        React.createElement('div', { className: 'chart-title' }, 'Issue Volume — Monthly Trend'),
+        React.createElement('div', { className: 'bar-chart' },
+          MONTHLY_DATA.map((d, i) =>
+            React.createElement('div', { key: i, className: 'bar-col' },
+              React.createElement('div', { className: 'bar', style: { height: Math.round((d.issues / MAX_BAR) * 100) + 'px', background: 'rgba(62,207,142,0.4)' } }),
+              React.createElement('div', { className: 'bar-lbl' }, d.m)
+            )
+          )
+        )
+      ),
+      React.createElement('div', { className: 'chart-card' },
+        React.createElement('div', { className: 'chart-title' }, 'Subscription Breakdown'),
+        React.createElement('div', { className: 'donut-wrap' },
+          [['Premium', users.filter(u => u.subscription === 'Premium').length, '#e8b85a'],
+           ['Standard', users.filter(u => u.subscription === 'Standard').length, '#4f7bff'],
+           ['Free', users.filter(u => u.subscription === 'Free').length, '#8a93a8']].map(([label, val, color], i) =>
+            React.createElement('div', { key: i, className: 'donut-item' },
+              React.createElement('div', { className: 'donut-dot', style: { background: color } }),
+              React.createElement('span', { className: 'donut-label' }, label),
+              React.createElement('span', { className: 'donut-val', style: { color } }, val + ' user' + (val !== 1 ? 's' : ''))
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+// ============= USER DASHBOARD =============
+function UserDashboard({ user, onLogout }) {
+  const [activePage, setActivePage] = useState('profile');
+  const [toast, setToast] = useState('');
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2500); };
+
+  const subTotal = user.subscription === 'Premium' ? 90 : 30;
+  const subPct = user.subDays > 0 ? Math.min(100, Math.round((user.subDays / subTotal) * 100)) : 0;
+
+  const navItems = [
+    { id: 'profile', label: 'My Profile', icon: '◎' },
+    { id: 'books', label: 'My Books', icon: '▣' },
+    { id: 'history', label: 'History', icon: '◈' },
+  ];
+
+  const initials = user.name.split(' ').map(n => n[0]).join('');
+  const avatarColor = '#4f7bff';
+
+  const renderPage = () => {
+    if (activePage === 'profile') return React.createElement('div', null,
+      React.createElement('div', { className: 'page-header' },
+        React.createElement('h1', { className: 'page-title' }, 'My Dashboard'),
+        React.createElement('p', { className: 'page-sub' }, 'Welcome back, ' + user.name.split(' ')[0])
+      ),
+      React.createElement('div', { className: 'user-dash-grid' },
+        React.createElement('div', { className: 'profile-card' },
+          React.createElement('div', { className: 'profile-avatar', style: { background: 'rgba(79,123,255,0.15)', color: avatarColor } }, initials),
+          React.createElement('div', { className: 'profile-name' }, user.name),
+          React.createElement('div', { className: 'profile-email' }, user.email),
+          React.createElement('span', { className: user.subscription === 'Premium' ? 'badge badge-gold' : 'badge badge-blue' }, user.subscription + ' Plan'),
+          React.createElement('div', { className: 'profile-stats' },
+            React.createElement('div', { className: 'ps-item' },
+              React.createElement('div', { className: 'ps-num', style: { color: '#3ecf8e' } }, user.booksRead),
+              React.createElement('div', { className: 'ps-lbl' }, 'Books read')
+            ),
+            React.createElement('div', { className: 'ps-item' },
+              React.createElement('div', { className: 'ps-num', style: { color: '#4f7bff' } }, user.booksIssued),
+              React.createElement('div', { className: 'ps-lbl' }, 'Borrowed now')
+            )
+          )
+        ),
+        React.createElement('div', null,
+          React.createElement('div', { className: 'sub-card', style: { marginBottom: '1rem' } },
+            React.createElement('h3', null, 'Subscription Status'),
+            React.createElement('div', { className: 'sub-plan' },
+              React.createElement('div', { className: 'sub-plan-name' }, user.subscription + ' Plan'),
+              React.createElement('span', { className: user.subscription === 'Premium' ? 'badge badge-gold' : 'badge badge-blue' }, user.subDays > 0 ? user.subDays + ' days left' : 'Expired')
+            ),
+            React.createElement('div', { className: 'progress-label' },
+              React.createElement('span', null, 'Subscription duration'),
+              React.createElement('span', null, subPct + '%')
+            ),
+            React.createElement('div', { className: 'progress-bar' },
+              React.createElement('div', { className: 'progress-fill', style: { width: subPct + '%', background: user.subDays < 15 ? '#f87171' : '#4f7bff' } })
+            ),
+            user.subDays < 20 && React.createElement('p', { style: { fontSize: '0.8rem', color: '#f87171' } }, '⚠ Your subscription expires soon. Renew to keep access.')
+          ),
+          React.createElement('div', { className: 'sub-card' },
+            React.createElement('h3', null, 'Reading Stats'),
+            React.createElement('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' } },
+              [['Books Read', user.booksRead, '#3ecf8e'], ['Currently Borrowed', user.booksIssued, '#4f7bff'], ['Member Since', new Date(user.joined).getFullYear(), '#e8b85a']].map(([label, val, color], i) =>
+                React.createElement('div', { key: i, style: { background: 'var(--surface2)', borderRadius: '10px', padding: '0.85rem', textAlign: 'center' } },
+                  React.createElement('div', { style: { fontFamily: 'var(--font-display)', fontSize: '1.75rem', color, lineHeight: 1, marginBottom: '0.25rem' } }, val),
+                  React.createElement('div', { style: { fontSize: '0.72rem', color: 'var(--muted)' } }, label)
+                )
+              )
+            )
+          )
+        )
+      )
+    );
+
+    if (activePage === 'books') return React.createElement('div', null,
+      React.createElement('div', { className: 'page-header' },
+        React.createElement('h1', { className: 'page-title' }, 'My Books'),
+        React.createElement('p', { className: 'page-sub' }, user.issuedBooks.length + ' books currently borrowed')
+      ),
+      user.issuedBooks.length === 0
+        ? React.createElement('div', { className: 'empty-state' }, 'No books currently borrowed. Visit the library to check out a book.')
+        : React.createElement('div', null,
+          React.createElement('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' } },
+            user.issuedBooks.map(book =>
+              React.createElement('div', { key: book.id, className: 'table-card', style: { padding: '1.25rem' } },
+                React.createElement('div', { style: { width: 36, height: 48, background: 'rgba(79,123,255,0.15)', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.75rem', fontSize: '1.1rem' } }, '📖'),
+                React.createElement('h4', { style: { fontSize: '0.9rem', marginBottom: '0.25rem' } }, book.title),
+                React.createElement('p', { style: { fontSize: '0.78rem', color: 'var(--muted)', marginBottom: '0.75rem' } }, book.author),
+                React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' } },
+                  React.createElement('span', { style: { color: 'var(--muted)' } }, 'Issued: ' + book.issued),
+                  React.createElement('span', { style: { color: new Date(book.due) < new Date() ? '#f87171' : '#3ecf8e' } }, 'Due: ' + book.due)
+                ),
+                React.createElement('button', { className: 'action-btn', style: { marginTop: '0.75rem', width: '100%' }, onClick: () => showToast('Return request submitted for: ' + book.title) }, 'Request Return')
+              )
+            )
+          )
+        )
+    );
+
+    if (activePage === 'history') return React.createElement('div', null,
+      React.createElement('div', { className: 'page-header' },
+        React.createElement('h1', { className: 'page-title' }, 'Reading History'),
+        React.createElement('p', { className: 'page-sub' }, user.booksRead + ' books read total')
+      ),
+      React.createElement('div', { className: 'table-card' },
+        React.createElement('div', { className: 'table-header' },
+          React.createElement('span', { className: 'table-title' }, 'Past Books')
+        ),
+        React.createElement('table', null,
+          React.createElement('thead', null,
+            React.createElement('tr', null, ['Book Title', 'Author', 'Issued', 'Returned', 'Status'].map(h => React.createElement('th', { key: h }, h)))
+          ),
+          React.createElement('tbody', null,
+            [
+              { title: 'Atomic Habits', author: 'James Clear', issued: '2025-02-10', returned: '2025-02-28', status: 'Returned' },
+              { title: 'Deep Work', author: 'Cal Newport', issued: '2025-01-15', returned: '2025-02-01', status: 'Returned' },
+              { title: 'The Lean Startup', author: 'Eric Ries', issued: '2024-12-01', returned: '2024-12-20', status: 'Returned' },
+              { title: 'Zero to One', author: 'Peter Thiel', issued: '2024-11-10', returned: '2024-11-30', status: 'Returned' },
+            ].map((row, i) =>
+              React.createElement('tr', { key: i },
+                React.createElement('td', { style: { fontWeight: 500 } }, row.title),
+                React.createElement('td', { style: { color: 'var(--muted)' } }, row.author),
+                React.createElement('td', { style: { color: 'var(--muted)' } }, row.issued),
+                React.createElement('td', { style: { color: 'var(--muted)' } }, row.returned),
+                React.createElement('td', null, React.createElement('span', { className: 'badge badge-green' }, row.status))
+              )
+            )
+          )
+        )
+      )
+    );
+  };
+
+  return React.createElement('div', { className: 'dashboard' },
+    React.createElement('aside', { className: 'sidebar' },
+      React.createElement('div', { className: 'sidebar-logo' }, 'LibraryOS'),
+      React.createElement('div', { className: 'sidebar-section' },
+        React.createElement('div', { className: 'sidebar-label' }, 'My Library'),
+        navItems.map(item =>
+          React.createElement('div', { key: item.id, className: `sidebar-item ${activePage === item.id ? 'active' : ''}`, onClick: () => setActivePage(item.id) },
+            React.createElement('span', { className: 'icon' }, item.icon),
+            item.label
+          )
+        )
+      ),
+      React.createElement('div', { className: 'sidebar-footer' },
+        React.createElement('div', { className: 'user-pill' },
+          React.createElement('div', { className: 'avatar', style: { background: 'rgba(79,123,255,0.2)', color: '#7c9fff', fontSize: '0.65rem' } }, initials),
+          React.createElement('div', { className: 'user-info' },
+            React.createElement('div', { className: 'name' }, user.name.split(' ')[0]),
+            React.createElement('div', { className: 'role' }, user.subscription + ' Member')
+          )
+        ),
+        React.createElement('button', { className: 'logout-btn', onClick: onLogout }, '→ Sign Out')
+      )
+    ),
+    React.createElement('main', { className: 'main-content' }, renderPage()),
+    toast && React.createElement('div', { className: 'toast' }, '✓ ' + toast)
+  );
+}
+
+// ============= ROOT APP =============
+function App() {
+  const [currentUser, setCurrentUser] = useState(null);
+
+  const handleLogin = (user) => setCurrentUser(user);
+  const handleLogout = () => setCurrentUser(null);
+
+  if (!currentUser) return React.createElement(MarketingPage, { onLogin: handleLogin });
+  if (currentUser.role === 'Admin') return React.createElement(AdminDashboard, { user: currentUser, onLogout: handleLogout });
+  return React.createElement(UserDashboard, { user: currentUser, onLogout: handleLogout });
+}
+
+createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
+</body>
+</html>
